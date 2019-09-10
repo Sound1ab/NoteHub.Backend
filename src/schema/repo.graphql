@@ -1,0 +1,44 @@
+## Base
+extend type Query {
+    readRepo(username: String!, repo: String!): Repo
+    listRepos(username: String!): ModelRepoConnection!
+}
+
+type Mutation {
+    createRepo(input: CreateRepoInput!): Repo
+    updateRepo(input: UpdateRepoInput!): Repo
+    deleteRepo(input: DeleteRepoInput!): Repo
+}
+
+## Types
+type Repo {
+    id: Int!
+    node_id: String!
+    name: String!
+    full_name: String!
+    description: String
+}
+
+## Query outputs
+type ModelRepoConnection {
+    items: [Repo!]!
+}
+
+## Mutation inputs
+input CreateRepoInput {
+    name: String!
+    description: String
+}
+
+input UpdateRepoInput {
+    username: String!
+    repo: String!
+    name: String
+    description: String
+}
+
+input DeleteRepoInput {
+    username: String!
+    repo: String!
+}
+

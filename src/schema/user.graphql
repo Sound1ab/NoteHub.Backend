@@ -1,0 +1,14 @@
+## Base
+type Query {
+    readGithubUserAccessToken(code: String!, state: String!): String!
+    readGithubUser: GithubUser
+}
+
+## Types
+type GithubUser {
+    id: Int!
+    login: String!
+    avatar_url: String!
+    html_url: String!
+    name: String!
+}

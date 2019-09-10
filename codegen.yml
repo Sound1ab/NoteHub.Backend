@@ -1,0 +1,8 @@
+overwrite: true
+schema: "src/schema/*.graphql"
+generates:
+  src/resolvers-types.ts:
+    plugins:
+      - add: '/* tslint:disable */'
+      - "typescript"
+      - "typescript-resolvers"

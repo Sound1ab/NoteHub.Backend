@@ -1,0 +1,27 @@
+version: 2
+jobs:
+  api:
+    working_directory: ~/noted
+    docker:
+      - image: circleci/node:8.12-browsers-legacy
+    steps:
+      - checkout
+      - run:
+          name: Show current branch
+          command: echo ${CIRCLE_BRANCH}
+      - run:
+          name: Install local dependencies
+          command: |
+            cd api && npm install
+      - run:
+          name: Install pip
+          command: sudo apt-get install python-dev python-pip
+      - run:
+          name: Install AWS CLI
+          command: sudo pip install awscli
+      - run:
+          name: Install Serverless CLI
+          command: sudo npm i -g serverless
+      - run:
+          name: Deploy
+          command: cd api && sls deploy --stage prod

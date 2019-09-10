@@ -1,0 +1,39 @@
+service:
+  name: serverless-typescript
+
+plugins:
+  - serverless-dotenv-plugin
+  - serverless-webpack
+  - serverless-offline
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  region: eu-west-1
+  # NOTE: This needs to be way more secure
+  iamRoleStatements:
+    - Effect: "Allow"
+      Action: "*"
+      Resource: "*"
+
+custom:
+  webpack:
+    includeModules: true
+  dotenv:
+    path: .env
+
+functions:
+  hello:
+    handler: src/handlers.hello
+    events:
+      - http:
+          method: get
+          path: hello
+  graphql:
+    handler: src/handlers.graphql
+    events:
+      - http:
+          method: ANY
+          path: graphql
+          cors: true

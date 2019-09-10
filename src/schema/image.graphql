@@ -1,0 +1,11 @@
+## Base
+extend type Query {
+    readImage(username: String!, repo: String!, filename: String!): File
+    listImages(username: String!, repo: String!): ModelFileConnection!
+}
+
+extend type Mutation {
+    createImage(input: CreateFileInput!): File
+    updateImage(input: UpdateFileInput!): File
+    deleteImage(input: DeleteFileInput!): File
+}

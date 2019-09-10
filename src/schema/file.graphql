@@ -1,0 +1,51 @@
+## Base
+extend type Query {
+    readFile(username: String!, repo: String!, filename: String!): File
+    listFiles(username: String!, repo: String!): ModelFileConnection!
+}
+
+extend type Mutation {
+    createFile(input: CreateFileInput!): File
+    updateFile(input: UpdateFileInput!): File
+    deleteFile(input: DeleteFileInput!): File
+}
+
+## Types
+type Links {
+    html: String!
+}
+
+type File {
+    filename: String!
+    path: String!
+    content: String
+    excerpt: String
+    sha: String!
+    _links: Links!
+}
+
+## Query outputs
+type ModelFileConnection {
+    items: [File!]!
+}
+
+## Mutation inputs
+input CreateFileInput {
+    username: String!
+    repo: String!
+    filename: String!
+    content: String
+}
+
+input UpdateFileInput {
+    username: String!
+    repo: String!
+    filename: String!
+    content: String
+}
+
+input DeleteFileInput {
+    username: String!
+    repo: String!
+    filename: String!
+}
