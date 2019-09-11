@@ -16,19 +16,7 @@ function initManagers(token: string) {
   return { fileManager, repoManager, userManager }
 }
 
-const expressContext = ({ req }: any) => {
-  const token = req.headers.authorization
-  const isAccessTokenRequest =
-    req.body.operationName === 'ReadGithubUserAccessToken'
-
-  if (!token && !isAccessTokenRequest) {
-    throw ERRORS.AUTHENTICATION_ERROR
-  }
-
-  return initManagers(token)
-}
-
-function configureServer() {
+export function configureServer() {
   const resolvers = {
     Mutation: {
       ...RepoMutations(),
@@ -45,10 +33,11 @@ function configureServer() {
   return new ApolloServer({
     context: ({ event, context }: any) => {
       const token = event.headers.Authorization
+      const managers = initManagers(token)
 
       return {
         ...context,
-        ...initManagers(token),
+        ...managers,
         event,
         headers: event.headers,
       }
@@ -66,5 +55,3 @@ function configureServer() {
     typeDefs: generateTypedefs(),
   })
 }
-
-export const server = configureServer()

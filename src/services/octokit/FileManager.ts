@@ -44,7 +44,7 @@ export class FileManager extends Github {
         filename: file.name,
       }))
     } catch (error) {
-      // First time creating a repo a no new files have been added before
+      // First time creating a repo and no new files have been added yet
       if (error.message === 'This repository is empty.') {
         console.log('here')
         const file = await this.createFile(owner, repo, 'my note.md', '')

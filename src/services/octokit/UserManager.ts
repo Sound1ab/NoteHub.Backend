@@ -1,18 +1,10 @@
 import axios from 'axios'
 import { Github } from './Base'
 
-const isDev = process.env.NODE_ENV === 'development'
-
 const GITHUB_ACCESS_TOKEN_LINK = process.env.GITHUB_ACCESS_TOKEN_LINK as string
-const CLIENT_SECRET = isDev
-  ? process.env.CLIENT_SECRET_DEV
-  : process.env.CLIENT_SECRET_PROD
-const CLIENT_ID = isDev
-  ? process.env.REACT_APP_CLIENT_ID_DEV
-  : process.env.REACT_APP_CLIENT_ID_PROD
-const REDIRECT_URL = isDev
-  ? process.env.REACT_APP_REDIRECT_URL_DEV
-  : process.env.REACT_APP_REDIRECT_URL_PROD
+const CLIENT_SECRET = process.env.CLIENT_SECRET
+const CLIENT_ID = process.env.REACT_APP_CLIENT_ID
+const REDIRECT_URL = process.env.REACT_APP_REDIRECT_UR
 
 export class UserManager extends Github {
   public async readGithubUserAccessToken(code: string, state: string) {

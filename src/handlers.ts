@@ -1,7 +1,7 @@
 import { APIGatewayProxyHandler } from 'aws-lambda'
-import { server } from './server'
+import { configureServer } from './server'
 
-export const graphql = server.createHandler({
+export const graphql = configureServer().createHandler({
   cors: {
     credentials: true,
     origin: '*',
