@@ -4,7 +4,7 @@ import { Github } from './Base'
 const GITHUB_ACCESS_TOKEN_LINK = process.env.GITHUB_ACCESS_TOKEN_LINK as string
 const CLIENT_SECRET = process.env.CLIENT_SECRET
 const CLIENT_ID = process.env.CLIENT_ID
-const REDIRECT_URL = process.env.REDIRECT_UR
+const REDIRECT_URL = process.env.REDIRECT_URL
 
 export class UserManager extends Github {
   public async readGithubUserAccessToken(code: string, state: string) {

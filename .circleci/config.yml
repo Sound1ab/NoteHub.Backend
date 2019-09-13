@@ -23,4 +23,9 @@ jobs:
           command: sudo npm i -g serverless
       - run:
           name: Deploy
-          command: sls deploy --stage prod
+          command: |
+            if [ "${CIRCLE_BRANCH}" == "development" ]; then
+                sls deploy --stage dev
+            elif [ "${CIRCLE_BRANCH}" == "master" ]; then
+                sls deploy --stage prod
+            fi
