@@ -4,10 +4,8 @@
   "description": "",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "tsnd --respawn --transpileOnly ./src/server.ts",
-    "start:docker": "tsnd --respawn --transpileOnly ./src/server.ts",
-    "sls:offline": "NODE_ENV=development sls offline start",
-    "sls:deploy": "sls deploy",
+    "start": "sls offline start --stage dev",
+    "deploy": "sls deploy",
     "docker:up": "cd ../ && docker-compose up",
     "docker:down": "cd ../ && docker-compose down",
     "ssh": "docker exec -it $CONTAINER sh",

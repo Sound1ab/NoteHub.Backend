@@ -22,10 +22,17 @@ jobs:
           name: Install Serverless CLI
           command: sudo npm i -g serverless
       - run:
+          name: Create env
+          command: |
+            echo "GITHUB_ACCESS_TOKEN_LINK={GITHUB_ACCESS_TOKEN_LINK}" >> .env;
+            echo "CLIENT_SECRET={CLIENT_SECRET}" >> .env;
+            echo "CLIENT_ID={CLIENT_ID}" >> .env;
+            echo "REDIRECT_URL={REDIRECT_URL}" >> .env;
+      - run:
           name: Deploy
           command: |
             if [ "${CIRCLE_BRANCH}" == "development" ]; then
-                sls deploy --stage dev
+              sls deploy --stage dev
             elif [ "${CIRCLE_BRANCH}" == "master" ]; then
-                sls deploy --stage prod
+              sls deploy --stage prod
             fi
