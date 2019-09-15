@@ -20,10 +20,10 @@ commands:
     steps:
       - run:
           command: |
-            echo "GITHUB_ACCESS_TOKEN_LINK=${GITHUB_ACCESS_TOKEN_LINK}_${ENV}" >> .env;
-            echo "CLIENT_SECRET=${CLIENT_SECRET}_${ENV}" >> .env;
-            echo "CLIENT_ID=${CLIENT_ID}_${ENV}" >> .env;
-            echo "REDIRECT_URL=${REDIRECT_URL}_${ENV}" >> .env;
+            echo "GITHUB_ACCESS_TOKEN_LINK=${GITHUB_ACCESS_TOKEN_LINK_${ENV}}" >> .env;
+            echo "CLIENT_SECRET=${CLIENT_SECRET_${ENV}}" >> .env;
+            echo "CLIENT_ID=${CLIENT_ID_${ENV}}" >> .env;
+            echo "REDIRECT_URL=${REDIRECT_URL_${ENV}}" >> .env;
   deploy:
     description: "Serverless deploy development"
     steps:
@@ -36,8 +36,21 @@ jobs:
     docker:
       - image: circleci/node:carbon
     environment:
-      - ENV: PRODUCTION
+      - ENV: PROD
       - STAGE: prod
+    steps:
+      - checkout
+      - install-package-dependencies
+      - configure-aws
+      - create-env
+      - deploy
+  build-development:
+    working_directory: ~/noted
+    docker:
+      - image: circleci/node:carbon
+    environment:
+      - ENV: DEV
+      - STAGE: dev
     steps:
       - checkout
       - install-package-dependencies
@@ -53,3 +66,9 @@ workflows:
           filters:
             branches:
               only: master
+  build-development:
+    jobs:
+      - build-development:
+          filters:
+            branches:
+              only: development
