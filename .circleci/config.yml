@@ -15,15 +15,24 @@ commands:
           command: sudo pip install awscli
       - run:
           command: sudo npm i -g serverless
-  create-env:
-    description: "Build env file"
+  create-dev-env:
+    description: "Build dev env file"
     steps:
       - run:
           command: |
-            echo "GITHUB_ACCESS_TOKEN_LINK=${GITHUB_ACCESS_TOKEN_LINK}_${ENV}" >> .env;
-            echo "CLIENT_SECRET=${CLIENT_SECRET}_${ENV}" >> .env;
-            echo "CLIENT_ID=${CLIENT_ID}_${ENV}" >> .env;
-            echo "REDIRECT_URL=${REDIRECT_URL}_${ENV}" >> .env;
+            echo "GITHUB_ACCESS_TOKEN_LINK=${GITHUB_ACCESS_TOKEN_LINK_DEV}" >> .env;
+            echo "CLIENT_SECRET=${CLIENT_SECRET_DEV}" >> .env;
+            echo "CLIENT_ID=${CLIENT_ID_DEV}" >> .env;
+            echo "REDIRECT_URL=${REDIRECT_URL_DEV}" >> .env;
+  create-prod-env:
+    description: "Build prod env file"
+    steps:
+      - run:
+          command: |
+            echo "GITHUB_ACCESS_TOKEN_LINK=${GITHUB_ACCESS_TOKEN_LINK_PROD}" >> .env;
+            echo "CLIENT_SECRET=${CLIENT_SECRET_PROD}" >> .env;
+            echo "CLIENT_ID=${CLIENT_ID_PROD}" >> .env;
+            echo "REDIRECT_URL=${REDIRECT_URL_PROD}" >> .env;
   deploy:
     description: "Serverless deploy development"
     steps:
@@ -36,26 +45,24 @@ jobs:
     docker:
       - image: circleci/node:carbon
     environment:
-      - ENV: PROD
       - STAGE: prod
     steps:
       - checkout
       - install-package-dependencies
       - configure-aws
-      - create-env
+      - create-prod-env
       - deploy
   build-development:
     working_directory: ~/noted
     docker:
       - image: circleci/node:carbon
     environment:
-      - ENV: DEV
       - STAGE: dev
     steps:
       - checkout
       - install-package-dependencies
       - configure-aws
-      - create-env
+      - create-dev-env
       - deploy
 
 workflows:
