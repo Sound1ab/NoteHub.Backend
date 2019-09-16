@@ -1,5 +1,5 @@
 service:
-  name: serverless-typescript
+  name: noted
 
 plugins:
   - serverless-dotenv-plugin
