@@ -25,7 +25,6 @@ export function FileQueries() {
     ): Promise<ModelFileConnection> {
       const files = await fileManager.listFiles(username, repo)
       // Todo: Move into markdown specific resolver
-      console.log(files)
       return {
         items: files.filter(file => file.filename.includes('.md')),
       }

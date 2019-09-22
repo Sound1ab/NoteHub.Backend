@@ -11,11 +11,12 @@ export class RepoManager extends Github {
     return this.formatRepoResult(data)
   }
 
-  public async listRepos(username: string): Promise<Repo[]> {
+  public async listRepos(): Promise<Repo[]> {
     let result
     try {
-      const { data } = await this.octokit.repos.listForUser({
-        username,
+      const { data } = await this.octokit.repos.list({
+        affiliation: 'owner',
+        per_page: 100,
       })
       result = data
     } catch (error) {
@@ -33,11 +34,13 @@ export class RepoManager extends Github {
 
   public async createRepo(
     name: string,
-    description?: string | null
+    description?: string | null,
+    privateRepo?: boolean | null
   ): Promise<Repo> {
     const { data } = await this.octokit.repos.createForAuthenticatedUser({
       description: description || '',
       name: `${this.repoNamespace}${name}`,
+      private: privateRepo ? privateRepo : undefined,
     })
     return this.formatRepoResult(data)
   }
@@ -48,7 +51,7 @@ export class RepoManager extends Github {
     updatedName?: string | null,
     updatedDescription?: string | null
   ): Promise<Repo> {
-    const {description, name} = await this.readRepo(owner, repo)
+    const { description, name } = await this.readRepo(owner, repo)
     const { data } = await this.octokit.repos.update({
       description: updatedDescription || description || '',
       name: updatedName || name || '',

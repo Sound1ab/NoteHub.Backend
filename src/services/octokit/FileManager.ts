@@ -3,6 +3,8 @@ import { File } from '../../resolvers-types'
 import { Github } from './Base'
 
 export class FileManager extends Github {
+  private note = 'index.md'
+
   public async readFile(
     owner: string,
     repo: string,
@@ -36,7 +38,7 @@ export class FileManager extends Github {
       })
       // Files have been previously added but all have been deleted
       if (data.length === 0) {
-        const file = await this.createFile(owner, repo, 'my note.md', '')
+        const file = await this.createFile(owner, repo, this.note, '')
         return [file]
       }
       return data.map((file: Octokit.AnyResponse['data']) => ({
@@ -46,8 +48,7 @@ export class FileManager extends Github {
     } catch (error) {
       // First time creating a repo and no new files have been added yet
       if (error.message === 'This repository is empty.') {
-        console.log('here')
-        const file = await this.createFile(owner, repo, 'my note.md', '')
+        const file = await this.createFile(owner, repo, this.note, '')
         return [file]
       }
       if (

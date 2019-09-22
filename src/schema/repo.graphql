@@ -1,7 +1,7 @@
 ## Base
 extend type Query {
     readRepo(username: String!, repo: String!): Repo
-    listRepos(username: String!): ModelRepoConnection!
+    listRepos: ModelRepoConnection!
 }
 
 type Mutation {
@@ -17,6 +17,7 @@ type Repo {
     name: String!
     full_name: String!
     description: String
+    private: Boolean!
 }
 
 ## Query outputs
@@ -28,6 +29,7 @@ type ModelRepoConnection {
 input CreateRepoInput {
     name: String!
     description: String
+    private: Boolean
 }
 
 input UpdateRepoInput {

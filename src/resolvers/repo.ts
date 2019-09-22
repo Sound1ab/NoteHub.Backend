@@ -3,7 +3,6 @@ import {
   MutationCreateRepoArgs,
   MutationDeleteRepoArgs,
   MutationUpdateRepoArgs,
-  QueryListReposArgs,
   QueryReadRepoArgs,
   Repo,
 } from '../resolvers-types'
@@ -19,11 +18,11 @@ export function RepoQueries() {
       return repoManager.readRepo(username, repo)
     },
     async listRepos(
-      _,
-      { username }: QueryListReposArgs,
+      _1,
+      _2,
       { repoManager }: { repoManager: RepoManager }
     ): Promise<ModelRepoConnection> {
-      const repos = await repoManager.listRepos(username)
+      const repos = await repoManager.listRepos()
       return {
         items: repos,
       }
@@ -38,7 +37,7 @@ export function RepoMutations() {
       { input }: MutationCreateRepoArgs,
       { repoManager }: { repoManager: RepoManager }
     ): Promise<Repo> {
-      return repoManager.createRepo(input.name, input.description)
+      return repoManager.createRepo(input.name, input.description, input.private)
     },
     async updateRepo(
       _,
@@ -49,7 +48,7 @@ export function RepoMutations() {
         input.username,
         input.repo,
         input.name,
-        input.description
+        input.description,
       )
     },
     async deleteRepo(
