@@ -42,6 +42,7 @@ input UpdateFileInput {
     repo: String!
     filename: String!
     content: String
+    sha: String
 }
 
 input DeleteFileInput {
