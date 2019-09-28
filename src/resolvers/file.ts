@@ -43,10 +43,10 @@ export function FileMutations() {
     },
     async updateFile(
       _,
-      { input: { content, filename, repo, username, sha } }: MutationUpdateFileArgs,
+      { input: { content, filename, repo, username } }: MutationUpdateFileArgs,
       { fileManager }: { fileManager: FileManager }
     ): Promise<File> {
-      return fileManager.updateFile(username, repo, filename, content, sha)
+      return fileManager.updateFile(username, repo, filename, content)
     },
     async deleteFile(
       _,

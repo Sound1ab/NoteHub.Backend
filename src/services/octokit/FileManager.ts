@@ -88,11 +88,11 @@ export class FileManager extends Github {
     owner: string,
     repo: string,
     name: string,
-    content: string,
-    sha: string
+    content?: string | null,
   ): Promise<File> {
+    const {sha, content: originalContent} = await this.readFile(owner, repo, name)
     await this.octokit.repos.updateFile({
-      content: Github.encodeToBase64(content),
+      content: Github.encodeToBase64(content || originalContent || ''),
       message: Github.formCommitMessage(name, 'update'),
       owner,
       path: `${name}`,

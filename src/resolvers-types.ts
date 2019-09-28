@@ -183,7 +183,6 @@ export type UpdateFileInput = {
   repo: Scalars['String'],
   filename: Scalars['String'],
   content?: Maybe<Scalars['String']>,
-  sha?: Maybe<Scalars['String']>,
 };
 
 export type UpdateRepoInput = {
