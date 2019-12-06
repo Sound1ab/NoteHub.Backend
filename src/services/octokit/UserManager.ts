@@ -1,20 +1,27 @@
 import axios from 'axios'
 import { Github } from './Base'
 
-const GITHUB_ACCESS_TOKEN_LINK = process.env.GITHUB_ACCESS_TOKEN_LINK as string
-const CLIENT_SECRET = process.env.CLIENT_SECRET
-const CLIENT_ID = process.env.CLIENT_ID
-const REDIRECT_URL = process.env.REDIRECT_URL
+const GITHUB_ACCESS_TOKEN_LINK = process.env.SERVERLESS_APP_GITHUB_ACCESS_TOKEN_LINK
+const CLIENT_SECRET = process.env.SERVERLESS_APP_CLIENT_SECRET
+const CLIENT_ID = process.env.SERVERLESS_APP_CLIENT_ID
+const REDIRECT_URL = process.env.SERVERLESS_APP_REDIRECT_URL
+
+console.log('GITHUB_ACCESS_TOKEN_LINK', GITHUB_ACCESS_TOKEN_LINK)
+console.log('CLIENT_SECRET', CLIENT_SECRET)
+console.log('CLIENT_ID', CLIENT_ID)
+console.log('REDIRECT_URL', REDIRECT_URL)
 
 export class UserManager extends Github {
   public async readGithubUserAccessToken(code: string, state: string) {
-    const { data } = await axios.post(GITHUB_ACCESS_TOKEN_LINK, {
+    const { data } = await axios.post(GITHUB_ACCESS_TOKEN_LINK as string, {
       client_id: CLIENT_ID,
       client_secret: CLIENT_SECRET,
       code,
       redirect_uri: REDIRECT_URL,
       state,
     })
+
+    console.log('data', data)
 
     const includesAccessToken = data.includes('access_token')
 

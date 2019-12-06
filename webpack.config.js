@@ -7,7 +7,7 @@ module.exports = {
   devtool: 'source-map',
   entry: slsw.lib.entries,
   externals: [nodeExternals()],
-  mode: 'production',
+  mode: slsw.lib.webpack.isLocal ? "development" : "production",
   module: {
     rules: [
       {

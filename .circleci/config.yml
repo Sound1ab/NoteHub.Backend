@@ -1,81 +1,83 @@
 version: 2.1
 
+executors:
+  nodejs:
+    docker:
+      - image: circleci/node:erbium
+        environment:
+          BUCKET: noted
+          REGION: us-east-1
+
 commands:
-  install-package-dependencies:
-    description: "Install package.json dependencies"
+  install-dependencies:
+    description: "Install node module dependencies"
     steps:
-      - run:
-          command: npm install
+      - run: yarn install --frozen-lockfile
+  cache-dependencies:
+    description: "Cache the node_modules"
+    steps:
+      - save_cache:
+          key: v4-node_modules-{{ checksum "yarn.lock" }}
+          paths:
+            - ./node_modules
+  restore-cached-dependencies:
+    description: "Restore node modules from the cache"
+    steps:
+      - restore_cache:
+          keys:
+            - v4-node_modules-{{ checksum "yarn.lock" }}
   configure-aws:
     description: "Install dependencies for AWS and Serverless"
     steps:
-      - run:
-          command: sudo apt-get install python-dev python-pip
-      - run:
-          command: sudo pip install awscli
-      - run:
-          command: sudo npm i -g serverless
-  create-dev-env:
-    description: "Build dev env file"
-    steps:
-      - run:
-          command: |
-            echo "GITHUB_ACCESS_TOKEN_LINK=${GITHUB_ACCESS_TOKEN_LINK_DEV}" >> .env;
-            echo "CLIENT_SECRET=${CLIENT_SECRET_DEV}" >> .env;
-            echo "CLIENT_ID=${CLIENT_ID_DEV}" >> .env;
-            echo "REDIRECT_URL=${REDIRECT_URL_DEV}" >> .env;
-  create-prod-env:
-    description: "Build prod env file"
-    steps:
-      - run:
-          command: |
-            echo "GITHUB_ACCESS_TOKEN_LINK=${GITHUB_ACCESS_TOKEN_LINK_PROD}" >> .env;
-            echo "CLIENT_SECRET=${CLIENT_SECRET_PROD}" >> .env;
-            echo "CLIENT_ID=${CLIENT_ID_PROD}" >> .env;
-            echo "REDIRECT_URL=${REDIRECT_URL_PROD}" >> .env;
-  deploy:
-    description: "Serverless deploy development"
-    steps:
-      - run:
-          command: sls deploy --stage ${STAGE}
+      - run: sudo apt-get install python-dev python-pip
+      - run: sudo pip install awscli
+      - run: sudo npm i -g serverless
 
 jobs:
-  build-production:
-    working_directory: ~/noted
-    docker:
-      - image: circleci/node:carbon
-    environment:
-      - STAGE: prod
+  prepare:
+    executor: nodejs
     steps:
       - checkout
-      - install-package-dependencies
-      - configure-aws
-      - create-prod-env
-      - deploy
-  build-development:
-    working_directory: ~/noted
-    docker:
-      - image: circleci/node:carbon
-    environment:
-      - STAGE: dev
+      - restore-cached-dependencies
+      - install-dependencies
+      - cache-dependencies
+  deploy:
+    parameters:
+      stage:
+        description: 'The stage to deploy to.'
+        type: string
+      env:
+        description: 'The environment to deploy to.'
+        type: string
+    executor: nodejs
     steps:
       - checkout
-      - install-package-dependencies
+      - restore-cached-dependencies
       - configure-aws
-      - create-dev-env
-      - deploy
+#      - run: export NODE_ENV=<< parameters.env >> && bash ./.circleci/build_env.sh
+      - run: export NODE_ENV=<< parameters.env >> && . ./.circleci/build_env.sh && sls deploy --stage << parameters.stage >>
 
 workflows:
   version: 2
-  build-production:
+  main:
     jobs:
-      - build-production:
+      - prepare
+      - deploy:
+          name: deploy-development
+          stage: dev
+          env: development
+          requires:
+            - prepare
           filters:
             branches:
               only: master
-  build-development:
-    jobs:
-      - build-development:
-          filters:
-            branches:
-              only: development
+      - approve-production:
+          type: approval
+          requires:
+            - deploy-development
+      - deploy:
+          name: deploy-production
+          stage: prod
+          env: production
+          requires:
+            - approve-production
