@@ -41,6 +41,7 @@ export type File = {
   excerpt?: Maybe<Scalars['String']>,
   sha: Scalars['String'],
   _links: Links,
+  repo: Scalars['String'],
 };
 
 export type GithubUser = {
@@ -282,6 +283,7 @@ export type FileResolvers<Context = any, ParentType = ResolversTypes['File']> = 
   excerpt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
   sha?: Resolver<ResolversTypes['String'], ParentType, Context>,
   _links?: Resolver<ResolversTypes['Links'], ParentType, Context>,
+  repo?: Resolver<ResolversTypes['String'], ParentType, Context>,
 };
 
 export type GithubUserResolvers<Context = any, ParentType = ResolversTypes['GithubUser']> = {

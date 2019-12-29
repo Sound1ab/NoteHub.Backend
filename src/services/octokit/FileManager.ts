@@ -21,6 +21,7 @@ export class FileManager extends Github {
       content,
       excerpt: `${content.substring(0, 50)}...`,
       filename: data.name,
+      repo,
     }
   }
 
@@ -38,17 +39,18 @@ export class FileManager extends Github {
       // Files have been previously added but all have been deleted
       if (data.length === 0) {
         const file = await this.createFile(owner, repo, this.readme, '')
-        return [file]
+        return [{...file, repo}]
       }
       return data.map((file: Octokit.AnyResponse['data']) => ({
         ...file,
         filename: file.name,
+        repo,
       }))
     } catch (error) {
       // First time creating a repo and no new files have been added yet
       if (error.message === 'This repository is empty.') {
         const file = await this.createFile(owner, repo, this.readme, '')
-        return [file]
+        return [{...file, repo}]
       }
       if (
         error.message === 'Not Found' ||
@@ -94,7 +96,7 @@ export class FileManager extends Github {
       name
     )
     await this.octokit.repos.updateFile({
-      content: Github.encodeToBase64(content || originalContent || ''),
+      content: Github.encodeToBase64(content  ?? originalContent ?? ''),
       message: Github.formCommitMessage(name, 'update'),
       owner,
       path: `${name}`,
@@ -102,8 +104,6 @@ export class FileManager extends Github {
       sha,
     })
     return this.readFile(owner, repo, name)
-
-
   }
 
   public async deleteFile(
@@ -119,6 +119,6 @@ export class FileManager extends Github {
       repo: `${this.repoNamespace}${repo}`,
       sha: file.sha,
     })
-    return file
+    return {...file, repo}
   }
 }

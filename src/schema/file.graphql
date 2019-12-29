@@ -22,6 +22,7 @@ type File {
     excerpt: String
     sha: String!
     _links: Links!
+    repo: String!
 }
 
 ## Query outputs
