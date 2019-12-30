@@ -1,5 +1,5 @@
 import Octokit from '@octokit/rest'
-import { File } from '../../resolvers-types'
+import { File, UpdateFileInput } from '../../resolvers-types'
 import { Github } from './Base'
 
 export class FileManager extends Github {
@@ -39,7 +39,7 @@ export class FileManager extends Github {
       // Files have been previously added but all have been deleted
       if (data.length === 0) {
         const file = await this.createFile(owner, repo, this.readme, '')
-        return [{...file, repo}]
+        return [{ ...file, repo }]
       }
       return data.map((file: Octokit.AnyResponse['data']) => ({
         ...file,
@@ -50,7 +50,7 @@ export class FileManager extends Github {
       // First time creating a repo and no new files have been added yet
       if (error.message === 'This repository is empty.') {
         const file = await this.createFile(owner, repo, this.readme, '')
-        return [{...file, repo}]
+        return [{ ...file, repo }]
       }
       if (
         error.message === 'Not Found' ||
@@ -84,26 +84,49 @@ export class FileManager extends Github {
     return this.readFile(owner, repo, name)
   }
 
-  public async updateFile(
-    owner: string,
-    repo: string,
-    name: string,
-    content?: string | null
-  ): Promise<File> {
+  public async updateFile({
+    username,
+    updatedFilename,
+    repo,
+    filename,
+    content,
+  }: UpdateFileInput): Promise<File> {
     const { sha, content: originalContent } = await this.readFile(
-      owner,
+      username,
       repo,
-      name
+      filename
     )
-    await this.octokit.repos.updateFile({
-      content: Github.encodeToBase64(content  ?? originalContent ?? ''),
-      message: Github.formCommitMessage(name, 'update'),
-      owner,
-      path: `${name}`,
-      repo: `${this.repoNamespace}${repo}`,
-      sha,
-    })
-    return this.readFile(owner, repo, name)
+
+    if (!updatedFilename) {
+      await this.octokit.repos.updateFile({
+        content: Github.encodeToBase64(content ?? originalContent ?? ''),
+        message: Github.formCommitMessage(filename, 'update'),
+        owner: username,
+        path: filename,
+        repo: `${this.repoNamespace}${repo}`,
+        sha,
+      })
+
+      return this.readFile(username, repo, filename)
+    } else {
+      await this.octokit.repos.createOrUpdateFile({
+        content: Github.encodeToBase64(content ?? originalContent ?? ''),
+        message: Github.formCommitMessage(updatedFilename, 'update'),
+        owner: username,
+        path: updatedFilename,
+        repo: `${this.repoNamespace}${repo}`,
+        sha,
+      })
+
+      this.deleteFile(username, repo, filename)
+
+      const updatedFile = await this.readFile(username, repo, updatedFilename)
+
+      return {
+        ...updatedFile,
+        oldFilename: filename,
+      }
+    }
   }
 
   public async deleteFile(
@@ -119,6 +142,6 @@ export class FileManager extends Github {
       repo: `${this.repoNamespace}${repo}`,
       sha: file.sha,
     })
-    return {...file, repo}
+    return { ...file, repo }
   }
 }

@@ -17,6 +17,7 @@ type Links {
 
 type File {
     filename: String!
+    oldFilename: String
     path: String!
     content: String
     excerpt: String
@@ -42,6 +43,7 @@ input UpdateFileInput {
     username: String!
     repo: String!
     filename: String!
+    updatedFilename: String
     content: String
 }
 
