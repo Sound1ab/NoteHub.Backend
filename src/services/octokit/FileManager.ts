@@ -86,7 +86,6 @@ export class FileManager extends Github {
 
   public async updateFile({
     username,
-    updatedFilename,
     repo,
     filename,
     content,
@@ -97,36 +96,16 @@ export class FileManager extends Github {
       filename
     )
 
-    if (!updatedFilename) {
-      await this.octokit.repos.updateFile({
-        content: Github.encodeToBase64(content ?? originalContent ?? ''),
-        message: Github.formCommitMessage(filename, 'update'),
-        owner: username,
-        path: filename,
-        repo: `${this.repoNamespace}${repo}`,
-        sha,
-      })
+    await this.octokit.repos.updateFile({
+      content: Github.encodeToBase64(content ?? originalContent ?? ''),
+      message: Github.formCommitMessage(filename, 'update'),
+      owner: username,
+      path: filename,
+      repo: `${this.repoNamespace}${repo}`,
+      sha,
+    })
 
-      return this.readFile(username, repo, filename)
-    } else {
-      await this.octokit.repos.createOrUpdateFile({
-        content: Github.encodeToBase64(content ?? originalContent ?? ''),
-        message: Github.formCommitMessage(updatedFilename, 'update'),
-        owner: username,
-        path: updatedFilename,
-        repo: `${this.repoNamespace}${repo}`,
-        sha,
-      })
-
-      this.deleteFile(username, repo, filename)
-
-      const updatedFile = await this.readFile(username, repo, updatedFilename)
-
-      return {
-        ...updatedFile,
-        oldFilename: filename,
-      }
-    }
+    return this.readFile(username, repo, filename)
   }
 
   public async deleteFile(
