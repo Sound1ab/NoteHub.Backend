@@ -20,7 +20,7 @@ export class Github {
   }
 
   public octokit: Octokit
-  public repoNamespace = 'noted-app-notes--'
+  public repoNamespace = 'Soft.'
   private userAgent = 'noted-api-v1'
 
   public constructor(token?: string, log?: boolean) {
@@ -36,9 +36,7 @@ export class Github {
         },
         onRateLimit: (retryAfter: any, options: any) => {
           this.octokit.log.warn(
-            `Request quota exhausted for request ${options.method} ${
-              options.url
-            }`
+            `Request quota exhausted for request ${options.method} ${options.url}`
           )
 
           if (options.request.retryCount === 0) {
