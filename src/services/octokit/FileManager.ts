@@ -49,7 +49,8 @@ export class FileManager extends Github {
     } catch (error) {
       // First time creating a repo and no new files have been added yet
       if (error.message === 'This repository is empty.') {
-        const file = await this.createFile(owner, repo, this.readme, '')
+        const file = await this.createFile(owner, repo, this.readme, `# ${repo}`)
+        console.log('file', file)
         return [{ ...file, repo }]
       }
       if (
@@ -68,6 +69,22 @@ export class FileManager extends Github {
     name: string,
     content?: string | null
   ): Promise<File> {
+    try {
+      const file = await this.readFile(owner, repo, name)
+      if (file.sha) {
+        throw new Error('file already exists')
+      }
+    } catch (error) {
+      // We want to swallow these error messages and throw
+      // everything else
+      if (
+        !error.message.includes('This repository is empty.') &&
+        !error.message.includes('Not Found')
+      ) {
+        throw error
+      }
+    }
+
     try {
       await this.octokit.repos.createFile({
         content: content ? Github.encodeToBase64(content) : '',
