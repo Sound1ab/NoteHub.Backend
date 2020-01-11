@@ -16,12 +16,11 @@ export class UserManager extends Github {
       state,
     })
 
-    console.log('data', data)
-
     const includesAccessToken = data.includes('access_token')
 
     if (includesAccessToken) {
-      return data.replace(/access_token=/gi, '').split('&')[0]
+      const [accessToken] = data.replace(/access_token=/gi, '').split('&')
+      return accessToken
     } else {
       throw new Error('Error retrieving access token')
     }

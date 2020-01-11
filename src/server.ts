@@ -1,12 +1,15 @@
-import { ApolloServer } from 'apollo-server-lambda'
-import { GraphQLFormattedError } from 'graphql'
-import { ERRORS } from './errors'
+import { FileManager, RepoManager, UserManager } from './services/octokit'
 import { FileMutations, FileQueries } from './resolvers/file'
 import { ImageMutations, ImageQueries } from './resolvers/image'
 import { RepoMutations, RepoQueries } from './resolvers/repo'
+
+import { ApolloServer } from 'apollo-server-lambda'
+import { ApolloServerPlugin } from 'apollo-server-plugin-base'
+import Cookie from 'cookie'
+import { ERRORS } from './errors'
+import { GraphQLFormattedError } from 'graphql'
 import { UserQueries } from './resolvers/user'
 import { generateTypedefs } from './schema'
-import { FileManager, RepoManager, UserManager } from './services/octokit'
 
 function initManagers(token: string) {
   const fileManager = new FileManager(token)
@@ -16,28 +19,63 @@ function initManagers(token: string) {
   return { fileManager, repoManager, userManager }
 }
 
+const customHeadersPlugin: ApolloServerPlugin = {
+  requestDidStart() {
+    return {
+      willSendResponse(requestContext: any) {
+        const {
+          context: { addHeaders = [] },
+        } = requestContext.context
+
+        addHeaders.forEach(({ key, value }: any) => {
+          requestContext.response.http.headers.append(key, value)
+        })
+
+        return requestContext
+      },
+    }
+  },
+}
+
 export function configureServer() {
   const resolvers = {
     Mutation: {
-      ...RepoMutations(),
-      ...FileMutations(),
-      ...ImageMutations(),
+      ...RepoMutations,
+      ...FileMutations,
+      ...ImageMutations,
     },
     Query: {
-      ...UserQueries(),
-      ...RepoQueries(),
-      ...FileQueries(),
-      ...ImageQueries(),
+      ...UserQueries,
+      ...RepoQueries,
+      ...FileQueries,
+      ...ImageQueries,
     },
   }
   return new ApolloServer({
     context: ({ event, context }: any) => {
-      const token = event.headers.Authorization
-      const managers = initManagers(token)
+      const body = JSON.parse(event.body)
+
+      let managers: any
+
+      if (body.operationName === 'ReadGithubUserAccessToken') {
+        managers = initManagers('')
+      } else {
+        if (!event.headers?.Cookie) {
+          throw ERRORS.AUTHENTICATION_ERROR
+        }
+
+        const result = Cookie.parse(event.headers.Cookie)
+
+        if (!result?.accessToken) {
+          throw ERRORS.AUTHENTICATION_ERROR
+        }
+
+        managers = initManagers(result.accessToken)
+      }
 
       return {
-        ...context,
         ...managers,
+        context,
         event,
         headers: event.headers,
       }
@@ -51,6 +89,7 @@ export function configureServer() {
 
       return formattedError as GraphQLFormattedError
     },
+    plugins: [customHeadersPlugin],
     resolvers,
     typeDefs: generateTypedefs(),
   })
