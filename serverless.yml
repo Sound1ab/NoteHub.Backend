@@ -1,5 +1,5 @@
 service:
-  name: noted
+  name: softnote
 
 plugins:
   - serverless-dotenv-plugin
@@ -13,9 +13,9 @@ provider:
   region: eu-west-1
   # NOTE: This needs to be way more secure
   iamRoleStatements:
-    - Effect: "Allow"
-      Action: "*"
-      Resource: "*"
+    - Effect: 'Allow'
+      Action: '*'
+      Resource: '*'
 
 custom:
   webpack:
@@ -34,4 +34,8 @@ functions:
       - http:
           method: ANY
           path: graphql
-          cors: true
+          cors:
+            origins:
+              - 'http://noted-development.s3-website-eu-west-1.amazonaws.com'
+              - 'http://noted-master.s3-website-eu-west-1.amazonaws.com'
+            allowCredentials: true

@@ -10,24 +10,24 @@ executors:
 
 commands:
   install-dependencies:
-    description: "Install node module dependencies"
+    description: 'Install node module dependencies'
     steps:
       - run: yarn install --frozen-lockfile
   cache-dependencies:
-    description: "Cache the node_modules"
+    description: 'Cache the node_modules'
     steps:
       - save_cache:
           key: v4-node_modules-{{ checksum "yarn.lock" }}
           paths:
             - ./node_modules
   restore-cached-dependencies:
-    description: "Restore node modules from the cache"
+    description: 'Restore node modules from the cache'
     steps:
       - restore_cache:
           keys:
             - v4-node_modules-{{ checksum "yarn.lock" }}
   configure-aws:
-    description: "Install dependencies for AWS and Serverless"
+    description: 'Install dependencies for AWS and Serverless'
     steps:
       - run: sudo apt-get install python-dev python-pip
       - run: sudo pip install awscli
@@ -54,7 +54,6 @@ jobs:
       - checkout
       - restore-cached-dependencies
       - configure-aws
-#      - run: export NODE_ENV=<< parameters.env >> && bash ./.circleci/build_env.sh
       - run: export NODE_ENV=<< parameters.env >> && . ./.circleci/build_env.sh && sls deploy --stage << parameters.stage >>
 
 workflows:

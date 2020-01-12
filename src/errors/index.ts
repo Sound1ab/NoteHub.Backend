@@ -1,4 +1,4 @@
-import { AuthenticationError } from 'apollo-server-express'
+import { AuthenticationError } from 'apollo-server-lambda'
 
 export const ERRORS = {
   AUTHENTICATION_ERROR: new AuthenticationError(
