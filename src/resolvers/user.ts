@@ -31,4 +31,15 @@ export const UserQueries = {
   ): Promise<GithubUser> {
     return userManager.readUser()
   },
+
+  logout(_0, _1, { context }: any) {
+    const cookie = Cookie.serialize('accessToken', '', {
+      expires: new Date('August 19, 1975 23:15:30'),
+      httpOnly: true,
+    })
+
+    context.addHeaders = [{ key: 'Set-Cookie', value: cookie }]
+
+    return 'ok'
+  },
 }

@@ -53,25 +53,9 @@ export function configureServer() {
   }
   return new ApolloServer({
     context: ({ event, context }: any) => {
-      const body = JSON.parse(event.body)
+      const { accessToken = '' } = Cookie.parse(event.headers?.Cookie ?? '')
 
-      let managers: any
-
-      if (body.operationName === 'ReadGithubUserAccessToken') {
-        managers = initManagers('')
-      } else {
-        if (!event.headers?.Cookie) {
-          throw ERRORS.AUTHENTICATION_ERROR
-        }
-
-        const result = Cookie.parse(event.headers.Cookie)
-
-        if (!result?.accessToken) {
-          throw ERRORS.AUTHENTICATION_ERROR
-        }
-
-        managers = initManagers(result.accessToken)
-      }
+      const managers = initManagers(accessToken)
 
       return {
         ...managers,
