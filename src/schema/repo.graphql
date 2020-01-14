@@ -1,46 +1,46 @@
 ## Base
 extend type Query {
-    readRepo(username: String!, repo: String!): Repo
-    listRepos: ModelRepoConnection!
+  readRepo(username: String!, repo: String!): Repo
+  listRepos: ModelRepoConnection!
 }
 
 type Mutation {
-    createRepo(input: CreateRepoInput!): Repo
-    updateRepo(input: UpdateRepoInput!): Repo
-    deleteRepo(input: DeleteRepoInput!): Repo
+  createRepo(input: CreateRepoInput!): Repo
+  updateRepo(input: UpdateRepoInput!): Repo
+  deleteRepo(input: DeleteRepoInput!): Repo
 }
 
 ## Types
 type Repo {
-    id: Int!
-    node_id: String!
-    name: String!
-    full_name: String!
-    description: String
-    private: Boolean!
+  id: Int!
+  node_id: String!
+  name: String!
+  full_name: String!
+  description: String
+  private: Boolean!
 }
 
 ## Query outputs
 type ModelRepoConnection {
-    items: [Repo!]!
+  items: [Repo!]!
 }
 
 ## Mutation inputs
 input CreateRepoInput {
-    name: String!
-    description: String
-    private: Boolean
+  name: String!
+  description: String
+  private: Boolean
 }
 
 input UpdateRepoInput {
-    username: String!
-    repo: String!
-    name: String
-    description: String
+  username: String!
+  repo: String!
+  name: String
+  description: String
+  private: Boolean
 }
 
 input DeleteRepoInput {
-    username: String!
-    repo: String!
+  username: String!
+  repo: String!
 }
-

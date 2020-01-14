@@ -177,6 +177,7 @@ export type UpdateRepoInput = {
   repo: Scalars['String']
   name?: Maybe<Scalars['String']>
   description?: Maybe<Scalars['String']>
+  private?: Maybe<Scalars['Boolean']>
 }
 
 import { GraphQLResolveInfo } from 'graphql'

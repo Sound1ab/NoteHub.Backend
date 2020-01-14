@@ -6,6 +6,7 @@ import {
   QueryReadRepoArgs,
   Repo,
 } from '../resolvers-types'
+
 import { RepoManager } from '../services/octokit'
 
 export const RepoQueries = {
@@ -41,12 +42,7 @@ export const RepoMutations = {
     { input }: MutationUpdateRepoArgs,
     { repoManager }: { repoManager: RepoManager }
   ): Promise<Repo> {
-    return repoManager.updateRepo(
-      input.username,
-      input.repo,
-      input.name,
-      input.description,
-    )
+    return repoManager.updateRepo(input)
   },
   async deleteRepo(
     _,

@@ -1,6 +1,7 @@
-import Octokit from '@octokit/rest'
-import { Repo } from '../../resolvers-types'
+import { Repo, UpdateRepoInput } from '../../resolvers-types'
+
 import { Github } from './Base'
+import Octokit from '@octokit/rest'
 
 export class RepoManager extends Github {
   public async readRepo(owner: string, repo: string): Promise<Repo> {
@@ -45,17 +46,20 @@ export class RepoManager extends Github {
     return this.formatRepoResult(data)
   }
 
-  public async updateRepo(
-    owner: string,
-    repo: string,
-    updatedName?: string | null,
-    updatedDescription?: string | null
-  ): Promise<Repo> {
-    const { description, name } = await this.readRepo(owner, repo)
+  public async updateRepo({
+    description: updatedDescription,
+    repo,
+    username,
+    private: updatedPrivate,
+  }: UpdateRepoInput): Promise<Repo> {
+    const { description, private: isPrivate } = await this.readRepo(
+      username,
+      repo
+    )
     const { data } = await this.octokit.repos.update({
       description: updatedDescription || description || '',
-      name: updatedName || name || '',
-      owner,
+      owner: username,
+      private: updatedPrivate ?? isPrivate,
       repo: `${this.repoNamespace}${repo}`,
     })
     return this.formatRepoResult(data)
