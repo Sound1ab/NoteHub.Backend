@@ -4,6 +4,7 @@ import {
 } from '../resolvers-types'
 
 import Cookie from 'cookie'
+import { DynamoManager } from '../services/aws'
 import { UserManager } from '../services/octokit'
 
 export const UserQueries = {

@@ -6,6 +6,7 @@ import { RepoMutations, RepoQueries } from './resolvers/repo'
 import { ApolloServer } from 'apollo-server-lambda'
 import { ApolloServerPlugin } from 'apollo-server-plugin-base'
 import Cookie from 'cookie'
+import { DynamoManager } from './services/aws'
 import { ERRORS } from './errors'
 import { GraphQLFormattedError } from 'graphql'
 import { UserQueries } from './resolvers/user'
@@ -15,8 +16,9 @@ function initManagers(token: string) {
   const fileManager = new FileManager(token)
   const repoManager = new RepoManager(token)
   const userManager = new UserManager(token)
+  const dynamoManager = new DynamoManager()
 
-  return { fileManager, repoManager, userManager }
+  return { fileManager, repoManager, userManager, dynamoManager }
 }
 
 const customHeadersPlugin: ApolloServerPlugin = {

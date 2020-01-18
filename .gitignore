@@ -147,3 +147,5 @@ api/.webpack
 app/build
 
 .webpack
+
+.dynamodb

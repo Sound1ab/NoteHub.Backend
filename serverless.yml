@@ -4,6 +4,7 @@ service:
 plugins:
   - serverless-dotenv-plugin
   - serverless-webpack
+  - serverless-dynamodb-local
   - serverless-offline
 
 provider:
@@ -28,6 +29,11 @@ provider:
 custom:
   webpack:
     includeModules: true
+  dynamodb:
+    stages:
+      - ${self:provider.stage}
+    start:
+      migrate: true
 
 functions:
   hello:
@@ -50,7 +56,7 @@ functions:
 
 resources:
   Resources:
-    TodosDynamoDbTable:
+    SigningKeyDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
       DeletionPolicy: Retain
       Properties:
