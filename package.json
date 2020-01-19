@@ -51,6 +51,8 @@
     "graphql": "^14.2.1",
     "graphql-tag": "^2.10.1",
     "merge-graphql-schemas": "^1.5.8",
+    "njwt": "^1.0.0",
+    "rand-token": "^0.4.0",
     "serverless": "^1.51.0",
     "serverless-dotenv-plugin": "^2.1.1",
     "serverless-webpack": "^5.2.0",

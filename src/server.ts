@@ -1,25 +1,15 @@
-import { FileManager, RepoManager, UserManager } from './services/octokit'
+import { ApolloServer, AuthenticationError } from 'apollo-server-lambda'
+import { FileManager, JwtManager, RepoManager, UserManager } from './services'
 import { FileMutations, FileQueries } from './resolvers/file'
 import { ImageMutations, ImageQueries } from './resolvers/image'
 import { RepoMutations, RepoQueries } from './resolvers/repo'
 
-import { ApolloServer } from 'apollo-server-lambda'
 import { ApolloServerPlugin } from 'apollo-server-plugin-base'
-import Cookie from 'cookie'
-import { DynamoManager } from './services/aws'
+import { AuthorizationQueries } from './resolvers/authorization'
 import { ERRORS } from './errors'
 import { GraphQLFormattedError } from 'graphql'
 import { UserQueries } from './resolvers/user'
 import { generateTypedefs } from './schema'
-
-function initManagers(token: string) {
-  const fileManager = new FileManager(token)
-  const repoManager = new RepoManager(token)
-  const userManager = new UserManager(token)
-  const dynamoManager = new DynamoManager()
-
-  return { fileManager, repoManager, userManager, dynamoManager }
-}
 
 const customHeadersPlugin: ApolloServerPlugin = {
   requestDidStart() {
@@ -51,19 +41,70 @@ export function configureServer() {
       ...RepoQueries,
       ...FileQueries,
       ...ImageQueries,
+      ...AuthorizationQueries,
     },
   }
   return new ApolloServer({
     context: ({ event, context }: any) => {
-      const { accessToken = '' } = Cookie.parse(event.headers?.Cookie ?? '')
+      const body = JSON.parse(event.body)
+      const isLogin = body.query.toLowerCase().includes('login')
+      const isReadGithubUserAccessToken = body.query
+        .toLowerCase()
+        .includes('readgithubuseraccesstoken')
+      const isIntrospectionQuery = body.query
+        .toLowerCase()
+        .includes('IntrospectionQuery')
 
-      const managers = initManagers(accessToken)
+      if (isLogin) {
+        return {
+          context,
+          event,
+          jwtManager: new JwtManager(),
+        }
+      }
+
+      if (isReadGithubUserAccessToken) {
+        return {
+          context,
+          jwtManager: new JwtManager(),
+          userManager: new UserManager(),
+        }
+      }
+
+      if (!isIntrospectionQuery) {
+        return {
+          context,
+          event,
+        }
+      }
+
+      const bearerToken = event.headers.Authorization
+
+      let jwt: string
+
+      if (bearerToken.startsWith('Bearer ')) {
+        jwt = bearerToken.substring(7, bearerToken.length)
+      } else {
+        throw new AuthenticationError('No Bearer token')
+      }
+
+      const jwtManager = new JwtManager()
+
+      const {
+        body: { accessToken: encryptedAccessToken, iv },
+      } = jwtManager.verifyJwt(jwt)
+
+      const accessToken = jwtManager.decrypt(encryptedAccessToken, iv)
 
       return {
-        ...managers,
+        accessToken,
         context,
         event,
+        fileManager: new FileManager(accessToken),
         headers: event.headers,
+        jwtManager,
+        repoManager: new RepoManager(accessToken),
+        userManager: new UserManager(accessToken),
       }
     },
     formatError: (error: Error): GraphQLFormattedError => {

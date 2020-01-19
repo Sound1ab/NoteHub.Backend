@@ -1,7 +1,8 @@
-import axios from 'axios'
 import { Github } from './Base'
+import axios from 'axios'
 
-const GITHUB_ACCESS_TOKEN_LINK = process.env.SERVERLESS_APP_GITHUB_ACCESS_TOKEN_LINK
+const GITHUB_ACCESS_TOKEN_LINK =
+  process.env.SERVERLESS_APP_GITHUB_ACCESS_TOKEN_LINK
 const CLIENT_SECRET = process.env.SERVERLESS_APP_CLIENT_SECRET
 const CLIENT_ID = process.env.SERVERLESS_APP_CLIENT_ID
 const REDIRECT_URL = process.env.SERVERLESS_APP_REDIRECT_URL

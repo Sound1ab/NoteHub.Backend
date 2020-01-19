@@ -7,7 +7,8 @@ import {
   QueryListFilesArgs,
   QueryReadFileArgs,
 } from '../resolvers-types'
-import { FileManager } from '../services/octokit'
+
+import { FileManager } from '../services'
 
 export const FileQueries = {
   async readFile(

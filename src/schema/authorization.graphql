@@ -1,0 +1,6 @@
+## Base
+extend type Query {
+  login: String!
+  logout: String!
+  refresh: String
+}

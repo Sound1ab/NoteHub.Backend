@@ -12,15 +12,15 @@ const options =
 
 const dynamoDb = new DynamoDB.DocumentClient(options)
 
-const TableName = process.env.DYNAMODB_TABLE
-
 export class DynamoManager {
+  private readonly TableName: string
+
+  constructor(tableName: string) {
+    this.TableName = tableName
+  }
+
   public async create(id: string, values: Record<string, string>) {
     const timestamp = new Date().getTime()
-
-    if (!TableName) {
-      throw new Error('No tablename set')
-    }
 
     const params = {
       Item: {
@@ -29,16 +29,46 @@ export class DynamoManager {
         updatedAt: timestamp,
         ...values,
       },
-      TableName,
+      TableName: this.TableName,
     }
-
-    console.log('params', params)
 
     try {
       const response = await dynamoDb.put(params).promise()
       return response
     } catch (error) {
       throw new Error(`DynamoDB put error: ${error}`)
+    }
+  }
+
+  public async read(id: string) {
+    const params = {
+      Key: {
+        id,
+      },
+      TableName: this.TableName,
+    }
+
+    try {
+      const response = await dynamoDb.get(params).promise()
+      return response
+    } catch (error) {
+      throw new Error(`DynamoDB read error: ${error}`)
+    }
+  }
+
+  public async delete(id: string) {
+    const params = {
+      Key: {
+        id,
+      },
+      TableName: this.TableName,
+    }
+
+    try {
+      const response = await dynamoDb.delete(params).promise()
+      return response
+    } catch (error) {
+      throw new Error(`DynamoDB delete error: ${error}`)
     }
   }
 }

@@ -7,7 +7,7 @@ import {
   Repo,
 } from '../resolvers-types'
 
-import { RepoManager } from '../services/octokit'
+import { RepoManager } from '../services'
 
 export const RepoQueries = {
   async readRepo(

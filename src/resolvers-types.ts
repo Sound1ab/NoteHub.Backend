@@ -113,15 +113,17 @@ export type MutationDeleteRepoArgs = {
 }
 
 export type Query = {
+  login: Scalars['String']
+  logout: Scalars['String']
+  refresh?: Maybe<Scalars['String']>
   readFile?: Maybe<File>
   listFiles: ModelFileConnection
   readImage?: Maybe<File>
   listImages: ModelFileConnection
   readRepo?: Maybe<Repo>
   listRepos: ModelRepoConnection
-  readGithubUserAccessToken: Scalars['String']
   readGithubUser?: Maybe<GithubUser>
-  logout: Scalars['String']
+  readGithubUserAccessToken: Scalars['String']
 }
 
 export type QueryReadFileArgs = {
@@ -381,6 +383,9 @@ export type QueryResolvers<
   Context = any,
   ParentType = ResolversTypes['Query']
 > = {
+  login?: Resolver<ResolversTypes['String'], ParentType, Context>
+  logout?: Resolver<ResolversTypes['String'], ParentType, Context>
+  refresh?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>
   readFile?: Resolver<
     Maybe<ResolversTypes['File']>,
     ParentType,
@@ -416,18 +421,17 @@ export type QueryResolvers<
     ParentType,
     Context
   >
+  readGithubUser?: Resolver<
+    Maybe<ResolversTypes['GithubUser']>,
+    ParentType,
+    Context
+  >
   readGithubUserAccessToken?: Resolver<
     ResolversTypes['String'],
     ParentType,
     Context,
     QueryReadGithubUserAccessTokenArgs
   >
-  readGithubUser?: Resolver<
-    Maybe<ResolversTypes['GithubUser']>,
-    ParentType,
-    Context
-  >
-  logout?: Resolver<ResolversTypes['String'], ParentType, Context>
 }
 
 export type RepoResolvers<
