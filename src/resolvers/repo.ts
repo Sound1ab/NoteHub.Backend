@@ -7,20 +7,20 @@ import {
   Repo,
 } from '../resolvers-types'
 
-import { RepoManager } from '../services'
+import { IContext } from '../server'
 
 export const RepoQueries = {
   async readRepo(
     _,
     { username, repo }: QueryReadRepoArgs,
-    { repoManager }: { repoManager: RepoManager }
+    { dataSources: { repoManager } }: IContext
   ): Promise<Repo> {
     return repoManager.readRepo(username, repo)
   },
   async listRepos(
     _1,
     _2,
-    { repoManager }: { repoManager: RepoManager }
+    { dataSources: { repoManager } }: IContext
   ): Promise<ModelRepoConnection> {
     const repos = await repoManager.listRepos()
     return {
@@ -33,21 +33,21 @@ export const RepoMutations = {
   async createRepo(
     _,
     { input }: MutationCreateRepoArgs,
-    { repoManager }: { repoManager: RepoManager }
+    { dataSources: { repoManager } }: IContext
   ): Promise<Repo> {
     return repoManager.createRepo(input.name, input.description, input.private)
   },
   async updateRepo(
     _,
     { input }: MutationUpdateRepoArgs,
-    { repoManager }: { repoManager: RepoManager }
+    { dataSources: { repoManager } }: IContext
   ): Promise<Repo> {
     return repoManager.updateRepo(input)
   },
   async deleteRepo(
     _,
     { input }: MutationDeleteRepoArgs,
-    { repoManager }: { repoManager: RepoManager }
+    { dataSources: { repoManager } }: IContext
   ): Promise<Repo> {
     return repoManager.deleteRepo(input.username, input.repo)
   },

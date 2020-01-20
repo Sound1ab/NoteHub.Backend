@@ -1,81 +1,75 @@
 import { AuthenticationError } from 'apollo-server-lambda'
-import { JwtManager } from '../services'
+import { IContext } from '../server'
 import { QueryReadGithubUserAccessTokenArgs } from '../resolvers-types'
 
 export const AuthorizationQueries = {
   async login(
     _,
     { code, state }: QueryReadGithubUserAccessTokenArgs,
-    {
-      event,
-      jwtManager,
-    }: {
-      event: any
-      jwtManager: JwtManager
-    }
+    { cookie, dataSources: { jwtManager } }: IContext
   ): Promise<string> {
-    const refreshToken = jwtManager.parseRefreshTokenFromCookie(
-      event.headers?.Cookie
-    )
-
-    const accessToken = await jwtManager.verifyRefreshToken(refreshToken)
-
-    if (!accessToken) {
-      throw new AuthenticationError(
-        'RefreshToken has expired, please log back in'
-      )
+    if (!cookie) {
+      throw new AuthenticationError('No cookie sent')
     }
 
-    const { jwt } = jwtManager.createJwtWithToken(accessToken)
+    const refreshToken = jwtManager.parseRefreshTokenFromCookie(cookie)
+
+    const client = await jwtManager.getClient(refreshToken)
+
+    if (jwtManager.hasClientExpired(client)) {
+      throw new AuthenticationError('Client has exipred')
+    }
+
+    const jwt = jwtManager.createJwtWithToken(
+      client.encryptedAccessToken,
+      client.iv
+    )
 
     return jwt
   },
   async refresh(
     _0,
     _1,
-    {
-      context,
-      event,
-      jwtManager,
-      accessToken,
-    }: {
-      event: any
-      jwtManager: JwtManager
-      accessToken: string
-      context: any
-    }
+    { context, cookie, dataSources: { jwtManager } }: IContext
   ): Promise<string> {
-    const refreshToken = jwtManager.parseRefreshTokenFromCookie(
-      event.headers?.Cookie
-    )
+    if (!cookie) {
+      throw new AuthenticationError('No cookie sent')
+    }
 
-    const {
-      jwt,
-      refreshToken: newRefreshToken,
-    } = await jwtManager.regenerateTokens(accessToken, refreshToken)
+    const refreshToken = jwtManager.parseRefreshTokenFromCookie(cookie)
 
-    jwtManager.addCookie(context, 'refreshToken', newRefreshToken)
+    const client = await jwtManager.getClient(refreshToken)
 
-    return jwt
+    if (!jwtManager.hasClientExpired(client)) {
+      throw new AuthenticationError('RefreshToken is still valid')
+    }
+
+    const { value, iv } = client
+
+    await jwtManager.deleteClient(refreshToken)
+
+    const regeneratedJwt = jwtManager.createJwtWithToken(value, iv)
+
+    const regeneratedRefreshToken = jwtManager.createRefreshToken()
+
+    await jwtManager.addClient(regeneratedRefreshToken, value, iv)
+
+    jwtManager.addCookie(context, 'refreshToken', regeneratedRefreshToken)
+
+    return regeneratedJwt
   },
   async logout(
     _0,
     _1,
-    {
-      event,
-      context,
-      jwtManager,
-    }: {
-      event: any
-      jwtManager: JwtManager
-      context: any
-    }
+    { context, cookie, dataSources: { jwtManager } }: IContext
   ) {
-    const refreshToken = jwtManager.parseRefreshTokenFromCookie(
-      event.headers?.Cookie
-    )
+    if (!cookie) {
+      throw new AuthenticationError('No cookie sent')
+    }
 
-    await jwtManager.deleteRefresh(refreshToken)
+    const refreshToken = jwtManager.parseRefreshTokenFromCookie(cookie)
+
+    await jwtManager.deleteClient(refreshToken)
 
     jwtManager.removeCookie(context, 'refreshToken')
 

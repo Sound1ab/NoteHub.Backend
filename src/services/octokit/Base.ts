@@ -1,5 +1,8 @@
-import Throttle from '@octokit/plugin-throttling'
+import { DataSourceConfig } from 'apollo-datasource/src/index'
+import { IContext } from '../../server'
+import { JwtManager } from '..'
 import Octokit from '@octokit/rest'
+import Throttle from '@octokit/plugin-throttling'
 
 const octokitWithThrottle = Octokit.plugin(Throttle)
 
@@ -23,10 +26,23 @@ export class Github {
   public repoNamespace = 'Soft.'
   private userAgent = 'noted-api-v1'
 
-  public constructor(token?: string, log?: boolean) {
+  // Config is passed by Apollo when added as a DataSource in Apollo Server
+  public initialize({ context: { jwt } }: DataSourceConfig<IContext>): void {
+    const jwtManager = new JwtManager()
+    let accessToken: string
+
+    if (jwt) {
+      const {
+        body: { accessToken: encryptedAccessToken, iv },
+      } = jwtManager.getJwtValues(jwt)
+
+      accessToken = jwtManager.decrypt(encryptedAccessToken, iv)
+    } else {
+      accessToken = ''
+    }
+
     this.octokit = new octokitWithThrottle({
-      auth: `token ${token}`,
-      log: log ? console : {},
+      auth: `token ${accessToken}`,
       throttle: {
         onAbuseLimit: (retryAfter: any, options: any) => {
           // does not retry, only logs a warning

@@ -15,6 +15,7 @@ export class JwtManager {
   }
 
   private dynamoManager: DynamoManager
+  private context: Record<string, any>
 
   constructor() {
     const tableName = process.env.DYNAMODB_TABLE
@@ -26,79 +27,64 @@ export class JwtManager {
     this.dynamoManager = new DynamoManager(tableName)
   }
 
-  public createJwtWithToken(accessToken: string) {
-    const { value, iv } = this.encrypt(accessToken)
+  public initialize(config: { context: Record<string, any> }): void {
+    this.context = config.context
+  }
 
+  public createJwtWithToken(encryptedAccessToken: string, iv: string) {
     const claims = {
-      accessToken: value,
+      accessToken: encryptedAccessToken,
       iss: 'http://softnote.com/',
       iv,
     }
 
     const jwt = nJwt.create(claims, jwtSigningKey)
-    return { jwt: jwt.compact(), encryptedAccessToken: value }
+    return jwt.compact()
   }
 
   public createRefreshToken() {
     return randtoken.uid(256)
   }
 
-  public async generateTokensAndStoreRefresh(accessToken: string) {
-    const { jwt, encryptedAccessToken } = this.createJwtWithToken(accessToken)
-    const refreshToken = await this.createAndAddRefreshToken(
-      encryptedAccessToken
-    )
-
-    return { jwt, refreshToken }
-  }
-
-  public async regenerateTokens(accessToken: string, refreshToken: string) {
-    const encryptedAccesstoken = await this.verifyRefreshToken(refreshToken)
-
-    if (encryptedAccesstoken) {
-      throw new Error('Refresh token is still valid')
-    }
-
-    return this.generateTokensAndStoreRefresh(accessToken)
-  }
-
-  public verifyJwt(jwt: string) {
+  public getJwtValues(jwt: string) {
     try {
       return nJwt.verify(jwt, jwtSigningKey)
     } catch (error) {
-      throw new AuthenticationError('JWT is not valid, please log back in')
+      throw new AuthenticationError('JWT is not valid')
     }
   }
 
-  public async verifyRefreshToken(refreshToken: string) {
+  public async getClient(refreshToken: string) {
     const result = await this.dynamoManager.read(refreshToken)
 
-    if (!result.Item?.expires) {
-      throw new AuthenticationError('Refresh token is not valid, please log in')
+    if (!result.Item) {
+      throw new AuthenticationError('Client does not exist')
     }
 
-    const now = new Date().getTime()
-    const expires = result.Item.expires
-
-    if (expires < now) {
-      this.deleteRefresh(refreshToken)
-      return
-    }
-
-    return result.Item.accessToken
+    return result.Item
   }
 
-  public async deleteRefresh(refreshToken: string) {
+  public async addClient(
+    refreshToken: string,
+    encryptedAccessToken: string,
+    iv: string
+  ) {
+    return this.dynamoManager.create(refreshToken, {
+      encryptedAccessToken,
+      expires: JwtManager.aWeekFromNow(),
+      iv,
+    })
+  }
+
+  public async deleteClient(refreshToken: string) {
     return this.dynamoManager.delete(refreshToken)
   }
 
-  public async createAndAddRefreshToken(accessToken: string) {
-    const refreshToken = this.createRefreshToken()
-    await this.dynamoManager.create(refreshToken, {
-      accessToken,
-      expires: JwtManager.aWeekFromNow(),
-    })
-    return refreshToken
+  public hasClientExpired(client: any) {
+    const now = new Date().getTime()
+    const expires = client.expires
+
+    return expires < now
   }
 
   public addCookie(context: any, name: string, value: string) {
