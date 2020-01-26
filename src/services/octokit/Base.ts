@@ -2,7 +2,9 @@ import { DataSourceConfig } from 'apollo-datasource/src/index'
 import { IContext } from '../../server'
 import { JwtManager } from '..'
 import Octokit from '@octokit/rest'
+// @ts-ignore
 import Throttle from '@octokit/plugin-throttling'
+import { decrypt } from '../../utils'
 
 const octokitWithThrottle = Octokit.plugin(Throttle)
 
@@ -36,7 +38,7 @@ export class Github {
         body: { accessToken: encryptedAccessToken, iv },
       } = jwtManager.getJwtValues(jwt)
 
-      accessToken = jwtManager.decrypt(encryptedAccessToken, iv)
+      accessToken = decrypt(encryptedAccessToken, iv)
     } else {
       accessToken = ''
     }

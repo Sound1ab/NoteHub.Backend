@@ -11,7 +11,8 @@
     "one-line": false,
     "no-consecutive-blank-lines": false,
     "curly": false,
-    "ordered-imports": false
+    "ordered-imports": false,
+    "max-classes-per-file": false
   },
   "rulesDirectory": []
 }

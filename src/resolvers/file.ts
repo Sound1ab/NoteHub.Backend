@@ -8,7 +8,6 @@ import {
   QueryReadFileArgs,
 } from '../resolvers-types'
 
-import { FileManager } from '../services'
 import { IContext } from '../server'
 
 export const FileQueries = {

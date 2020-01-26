@@ -1,12 +1,15 @@
+import {
+  JwtExpiredError,
+  JwtSignatureMismatchError,
+  RefreshTokenExpiredError,
+  RefreshTokenNotValidError,
+  nJwtErrors,
+} from '../../errors'
+
 import { AuthenticationError } from 'apollo-server-lambda'
-import Cookie from 'cookie'
 import { DynamoManager } from '..'
-import crypto from 'crypto'
 import nJwt from 'njwt'
 import randtoken from 'rand-token'
-
-const jwtSigningKey = process.env.SERVERLESS_APP_JWT_SIGNING_KEY!
-const tokenSigningKey = process.env.SERVERLESS_APP_TOKEN_SIGNING_KEY!
 
 export class JwtManager {
   private static aWeekFromNow() {
@@ -32,14 +35,15 @@ export class JwtManager {
   }
 
   public createJwtWithToken(encryptedAccessToken: string, iv: string) {
+    const jwtSigningKey = process.env.SERVERLESS_APP_JWT_SIGNING_KEY!
+
     const claims = {
       accessToken: encryptedAccessToken,
       iss: 'http://softnote.com/',
       iv,
     }
 
-    const jwt = nJwt.create(claims, jwtSigningKey)
-    return jwt.compact()
+    return nJwt.create(claims, jwtSigningKey)
   }
 
   public createRefreshToken() {
@@ -47,18 +51,31 @@ export class JwtManager {
   }
 
   public getJwtValues(jwt: string) {
+    const jwtSigningKey = process.env.SERVERLESS_APP_JWT_SIGNING_KEY!
+
     try {
       return nJwt.verify(jwt, jwtSigningKey)
     } catch (error) {
-      throw new AuthenticationError('JWT is not valid')
+      switch (error.message) {
+        case nJwtErrors.EXPIRED:
+          throw new JwtExpiredError()
+        case nJwtErrors.SIGNATURE_MISMTACH:
+          throw new JwtSignatureMismatchError()
+        default:
+          throw new AuthenticationError(error.message)
+      }
     }
   }
 
   public async getClient(refreshToken: string) {
     const result = await this.dynamoManager.read(refreshToken)
 
-    if (!result.Item) {
-      throw new AuthenticationError('Client does not exist')
+    if (!result?.Item) {
+      throw new RefreshTokenNotValidError()
+    }
+
+    if (this.hasClientExpired(result.Item)) {
+      throw new RefreshTokenExpiredError()
     }
 
     return result.Item
@@ -85,59 +102,5 @@ export class JwtManager {
     const expires = client.expires
 
     return expires < now
-  }
-
-  public addCookie(context: any, name: string, value: string) {
-    const cookie = Cookie.serialize(name, value, {
-      httpOnly: true,
-      maxAge: 60 * 60 * 24 * 7, // 1 week
-    })
-
-    context.addHeaders = [{ key: 'Set-Cookie', value: cookie }]
-  }
-
-  public removeCookie(context: any, name: string) {
-    const cookie = Cookie.serialize(name, '', {
-      expires: new Date('August 19, 1975 23:15:30'),
-      httpOnly: true,
-    })
-
-    context.addHeaders = [{ key: 'Set-Cookie', value: cookie }]
-  }
-
-  public parseRefreshTokenFromCookie(cookie?: string) {
-    if (!cookie) {
-      throw new Error('No cookie present')
-    }
-    const parsedCookie = Cookie.parse(cookie)
-
-    if (!parsedCookie.refreshToken) {
-      throw new AuthenticationError('No refreshToken')
-    }
-
-    return parsedCookie.refreshToken
-  }
-
-  public encrypt(value: string): { value: string; iv: string } {
-    const key = crypto
-      .createHash('sha256')
-      .update(String(tokenSigningKey))
-      .digest('base64')
-      .substr(0, 32)
-    const iv = new Buffer(crypto.randomBytes(8)).toString('hex')
-    const cipher = crypto.createCipheriv('aes-256-ctr', key, iv)
-    const crypted = cipher.update(value, 'utf8', 'hex')
-    return { value: `${crypted}${cipher.final('hex')}`, iv }
-  }
-
-  public decrypt(value: string, iv: string): string {
-    const key = crypto
-      .createHash('sha256')
-      .update(String(tokenSigningKey))
-      .digest('base64')
-      .substr(0, 32)
-    const decipher = crypto.createDecipheriv('aes-256-ctr', key, iv)
-    const dec = decipher.update(value, 'hex', 'utf8')
-    return `${dec}${decipher.final('utf8')}`
   }
 }
