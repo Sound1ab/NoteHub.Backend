@@ -46,7 +46,7 @@ export class Github {
     this.octokit = new octokitWithThrottle({
       auth: `token ${accessToken}`,
       throttle: {
-        onAbuseLimit: (retryAfter: any, options: any) => {
+        onAbuseLimit: (_: any, options: any) => {
           // does not retry, only logs a warning
           this.octokit.log.warn(
             `Abuse detected for request ${options.method} ${options.url}`

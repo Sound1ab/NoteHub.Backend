@@ -6,8 +6,8 @@ import { RepoMutations, RepoQueries } from './resolvers/repo'
 
 import { ApolloServer } from 'apollo-server-lambda'
 import { ApolloServerPlugin } from 'apollo-server-plugin-base'
+import { AuthenticationError } from 'apollo-server-lambda'
 import { AuthorizationQueries } from './resolvers/authorization'
-import { ERRORS } from './errors'
 import { GraphQLFormattedError } from 'graphql'
 import { UserQueries } from './resolvers/user'
 import { generateTypedefs } from './schema'
@@ -92,7 +92,9 @@ export function configureServer() {
       const githubAuthError = error.message === 'Bad credentials'
 
       const formattedError = githubAuthError
-        ? ERRORS.AUTHENTICATION_ERROR
+        ? new AuthenticationError(
+            'You must be authorized to access this schema'
+          )
         : error
 
       return formattedError as GraphQLFormattedError

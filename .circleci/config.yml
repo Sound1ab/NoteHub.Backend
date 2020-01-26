@@ -26,6 +26,18 @@ commands:
       - restore_cache:
           keys:
             - v4-node_modules-{{ checksum "yarn.lock" }}
+  run-unit-tests:
+    description: 'Run unit tests'
+    steps:
+      - run: yarn test --ci --runInBand
+  run-linter-check:
+    description: 'Run linter'
+    steps:
+      - run: yarn lint
+  run-typescript-check:
+    description: 'Run typescript tests'
+    steps:
+      - run: yarn ts
   configure-aws:
     description: 'Install dependencies for AWS and Serverless'
     steps:
@@ -41,6 +53,24 @@ jobs:
       - restore-cached-dependencies
       - install-dependencies
       - cache-dependencies
+  test:
+    executor: nodejs
+    steps:
+      - checkout
+      - restore-cached-dependencies
+      - run-unit-tests
+  eslint:
+    executor: nodejs
+    steps:
+      - checkout
+      - restore-cached-dependencies
+      - run-linter-check
+  typescript:
+    executor: nodejs
+    steps:
+      - checkout
+      - restore-cached-dependencies
+      - run-typescript-check
   deploy:
     parameters:
       stage:
@@ -61,12 +91,24 @@ workflows:
   main:
     jobs:
       - prepare
+      - test:
+          requires:
+            - prepare
+      - eslint:
+          requires:
+            - prepare
+      - typescript:
+          requires:
+            - prepare
+
       - deploy:
           name: deploy-development
           stage: dev
           env: development
           requires:
-            - prepare
+            - test
+            - eslint
+            - typescript
           filters:
             branches:
               only: master

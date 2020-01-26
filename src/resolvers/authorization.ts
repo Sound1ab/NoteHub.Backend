@@ -2,12 +2,11 @@ import { addCookie, parseRefreshTokenFromCookie, removeCookie } from '../utils'
 
 import { AuthenticationError } from 'apollo-server-lambda'
 import { IContext } from '../server'
-import { QueryReadGithubUserAccessTokenArgs } from '../resolvers-types'
 
 export const AuthorizationQueries = {
   async login(
-    _: any,
-    { code, state }: QueryReadGithubUserAccessTokenArgs,
+    _0: any,
+    _1: any,
     { cookie, dataSources: { jwtManager } }: IContext
   ): Promise<string> {
     if (!cookie) {

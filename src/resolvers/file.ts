@@ -12,14 +12,14 @@ import { IContext } from '../server'
 
 export const FileQueries = {
   async readFile(
-    _,
+    _: any,
     { filename, repo, username }: QueryReadFileArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
     return fileManager.readFile(username, repo, filename)
   },
   async listFiles(
-    _,
+    _: any,
     { repo, username }: QueryListFilesArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<ModelFileConnection> {
@@ -33,21 +33,21 @@ export const FileQueries = {
 
 export const FileMutations = {
   async createFile(
-    _,
+    _: any,
     { input: { username, repo, filename, content } }: MutationCreateFileArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
     return fileManager.createFile(username, repo, filename, content)
   },
   async updateFile(
-    _,
+    _: any,
     { input }: MutationUpdateFileArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
     return fileManager.updateFile(input)
   },
   async deleteFile(
-    _,
+    _: any,
     { input: { filename, repo, username } }: MutationDeleteFileArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {

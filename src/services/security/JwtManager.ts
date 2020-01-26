@@ -18,7 +18,6 @@ export class JwtManager {
   }
 
   private dynamoManager: DynamoManager
-  private context: Record<string, any>
 
   constructor() {
     const tableName = process.env.DYNAMODB_TABLE
@@ -30,8 +29,9 @@ export class JwtManager {
     this.dynamoManager = new DynamoManager(tableName)
   }
 
-  public initialize(config: { context: Record<string, any> }): void {
-    this.context = config.context
+  // Needed to confirm to Apollo Datasource interface
+  public initialize(): void {
+    return
   }
 
   public createJwtWithToken(encryptedAccessToken: string, iv: string) {

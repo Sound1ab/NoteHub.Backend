@@ -11,15 +11,15 @@ import { IContext } from '../server'
 
 export const RepoQueries = {
   async readRepo(
-    _,
+    _: any,
     { username, repo }: QueryReadRepoArgs,
     { dataSources: { repoManager } }: IContext
   ): Promise<Repo> {
     return repoManager.readRepo(username, repo)
   },
   async listRepos(
-    _1,
-    _2,
+    _0: any,
+    _1: any,
     { dataSources: { repoManager } }: IContext
   ): Promise<ModelRepoConnection> {
     const repos = await repoManager.listRepos()
@@ -31,21 +31,21 @@ export const RepoQueries = {
 
 export const RepoMutations = {
   async createRepo(
-    _,
+    _: any,
     { input }: MutationCreateRepoArgs,
     { dataSources: { repoManager } }: IContext
   ): Promise<Repo> {
     return repoManager.createRepo(input.name, input.description, input.private)
   },
   async updateRepo(
-    _,
+    _: any,
     { input }: MutationUpdateRepoArgs,
     { dataSources: { repoManager } }: IContext
   ): Promise<Repo> {
     return repoManager.updateRepo(input)
   },
   async deleteRepo(
-    _,
+    _: any,
     { input }: MutationDeleteRepoArgs,
     { dataSources: { repoManager } }: IContext
   ): Promise<Repo> {

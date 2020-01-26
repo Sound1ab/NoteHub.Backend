@@ -5,11 +5,14 @@
   "scripts": {
     "test": "jest",
     "start": "sls offline start --stage dev --env local",
+    "lint": "tslint './src/**/*.{ts,tsx}'",
+    "ts": "tsc --noEmit --pretty --noUnusedParameters --noUnusedLocals",
     "deploy": "sls deploy --env production",
     "docker:up": "cd ../ && docker-compose up",
     "docker:down": "cd ../ && docker-compose down",
     "ssh": "docker exec -it $CONTAINER sh",
-    "codegen": "graphql-codegen --config codegen.yml"
+    "codegen": "graphql-codegen --config codegen.yml",
+    "codechecks": "yarn ts && yarn lint && yarn test"
   },
   "author": "",
   "license": "ISC",
