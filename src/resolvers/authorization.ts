@@ -15,11 +15,11 @@ export const AuthorizationQueries = {
 
     const refreshToken = parseRefreshTokenFromCookie(cookie)
 
-    const client = await jwtManager.getClient(refreshToken)
+    const { encryptedAccessToken, iv } = await jwtManager.getClient(
+      refreshToken
+    )
 
-    return jwtManager
-      .createJwtWithToken(client.encryptedAccessToken, client.iv)
-      .compact()
+    return jwtManager.createJwtWithToken(encryptedAccessToken, iv).compact()
   },
   async refresh(
     _0: any,
@@ -34,15 +34,21 @@ export const AuthorizationQueries = {
 
     const client = await jwtManager.getClient(refreshToken)
 
-    const { value, iv } = client
+    const { encryptedAccessToken, iv } = client
 
     await jwtManager.deleteClient(refreshToken)
 
-    const regeneratedJwt = jwtManager.createJwtWithToken(value, iv).compact()
+    const regeneratedJwt = jwtManager
+      .createJwtWithToken(encryptedAccessToken, iv)
+      .compact()
 
     const regeneratedRefreshToken = jwtManager.createRefreshToken()
 
-    await jwtManager.addClient(regeneratedRefreshToken, value, iv)
+    await jwtManager.addClient(
+      regeneratedRefreshToken,
+      encryptedAccessToken,
+      iv
+    )
 
     addCookie(context, 'refreshToken', regeneratedRefreshToken)
 
