@@ -1,6 +1,7 @@
-import Octokit from '@octokit/rest'
 import { File, UpdateFileInput } from '../../resolvers-types'
+
 import { Github } from './Base'
+import Octokit from '@octokit/rest'
 
 export class FileManager extends Github {
   private readme = 'README.md'
@@ -13,7 +14,7 @@ export class FileManager extends Github {
     const { data } = await this.octokit.repos.getContents({
       owner,
       path: name,
-      repo: `${this.repoNamespace}${repo}`,
+      repo: `${this.repoNamespace}.${repo}`,
     })
     const content = Github.decodeFromBase64(data.content)
     return {
@@ -34,7 +35,7 @@ export class FileManager extends Github {
       const { data } = await this.octokit.repos.getContents({
         owner,
         path,
-        repo: `${this.repoNamespace}${repo}`,
+        repo: `${this.repoNamespace}.${repo}`,
       })
       // Files have been previously added but all have been deleted
       if (data.length === 0) {
@@ -91,7 +92,7 @@ export class FileManager extends Github {
         message: Github.formCommitMessage(name, 'create'),
         owner,
         path: name,
-        repo: `${this.repoNamespace}${repo}`,
+        repo: `${this.repoNamespace}.${repo}`,
       })
     } catch (error) {
       if (!error.message.includes('"sha" wasn\'t supplied')) {
@@ -118,7 +119,7 @@ export class FileManager extends Github {
       message: Github.formCommitMessage(filename, 'update'),
       owner: username,
       path: filename,
-      repo: `${this.repoNamespace}${repo}`,
+      repo: `${this.repoNamespace}.${repo}`,
       sha,
     })
 
@@ -135,7 +136,7 @@ export class FileManager extends Github {
       message: Github.formCommitMessage(name, 'delete'),
       owner,
       path: `${name}`,
-      repo: `${this.repoNamespace}${repo}`,
+      repo: `${this.repoNamespace}.${repo}`,
       sha: file.sha,
     })
     return { ...file, repo }

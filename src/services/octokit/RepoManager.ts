@@ -7,7 +7,7 @@ export class RepoManager extends Github {
   public async readRepo(owner: string, repo: string): Promise<Repo> {
     const { data } = await this.octokit.repos.get({
       owner,
-      repo: `${this.repoNamespace}${repo}`,
+      repo: `${this.repoNamespace}.${repo}`,
     })
     return this.formatRepoResult(data)
   }
@@ -28,7 +28,7 @@ export class RepoManager extends Github {
     }
     return result
       .filter((repo: Octokit.AnyResponse['data']) =>
-        repo.name.includes(this.repoNamespace)
+        repo.name.startsWith(`${this.repoNamespace}.`)
       )
       .map((repo: Octokit.AnyResponse['data']) => this.formatRepoResult(repo))
   }
@@ -40,7 +40,7 @@ export class RepoManager extends Github {
   ): Promise<Repo> {
     const { data } = await this.octokit.repos.createForAuthenticatedUser({
       description: description || '',
-      name: `${this.repoNamespace}${name}`,
+      name: `${this.repoNamespace}.${name}`,
       private: privateRepo ? privateRepo : undefined,
     })
     return this.formatRepoResult(data)
@@ -60,7 +60,7 @@ export class RepoManager extends Github {
       description: updatedDescription || description || '',
       owner: username,
       private: updatedPrivate ?? isPrivate,
-      repo: `${this.repoNamespace}${repo}`,
+      repo: `${this.repoNamespace}.${repo}`,
     })
     return this.formatRepoResult(data)
   }
@@ -69,7 +69,7 @@ export class RepoManager extends Github {
     const originalRepo = await this.readRepo(owner, repo)
     await this.octokit.repos.delete({
       owner,
-      repo: `${this.repoNamespace}${repo}`,
+      repo: `${this.repoNamespace}.${repo}`,
     })
     return originalRepo
   }
@@ -86,6 +86,6 @@ export class RepoManager extends Github {
   }
 
   private removeNamespace(str: string) {
-    return str.replace(new RegExp(this.repoNamespace, 'gi'), '')
+    return str.replace(new RegExp(`${this.repoNamespace}.`, 'gi'), '')
   }
 }

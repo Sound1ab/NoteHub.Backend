@@ -25,7 +25,7 @@ export class Github {
   }
 
   public octokit: Octokit
-  public repoNamespace = 'Soft.'
+  public repoNamespace = 'NoteHub'
   private userAgent = 'noted-api-v1'
 
   // Config is passed by Apollo when added as a DataSource in Apollo Server

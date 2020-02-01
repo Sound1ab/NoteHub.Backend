@@ -39,7 +39,7 @@ export class JwtManager {
 
     const claims = {
       accessToken: encryptedAccessToken,
-      iss: 'http://softnote.com/',
+      iss: 'http://notehub.com/',
       iv,
     }
 
