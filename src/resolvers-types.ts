@@ -1,6 +1,5 @@
 /* tslint:disable */
-
-type Maybe<T> = T | null
+export type Maybe<T> = T | null
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: string
@@ -35,6 +34,7 @@ export type DeleteRepoInput = {
 }
 
 export type File = {
+  __typename?: 'File'
   filename: Scalars['String']
   path: Scalars['String']
   content?: Maybe<Scalars['String']>
@@ -45,6 +45,7 @@ export type File = {
 }
 
 export type GithubUser = {
+  __typename?: 'GithubUser'
   id: Scalars['Int']
   login: Scalars['String']
   avatar_url: Scalars['String']
@@ -53,18 +54,22 @@ export type GithubUser = {
 }
 
 export type Links = {
+  __typename?: 'Links'
   html: Scalars['String']
 }
 
 export type ModelFileConnection = {
+  __typename?: 'ModelFileConnection'
   items: Array<File>
 }
 
 export type ModelRepoConnection = {
+  __typename?: 'ModelRepoConnection'
   items: Array<Repo>
 }
 
 export type Mutation = {
+  __typename?: 'Mutation'
   createFile?: Maybe<File>
   updateFile?: Maybe<File>
   deleteFile?: Maybe<File>
@@ -113,17 +118,19 @@ export type MutationDeleteRepoArgs = {
 }
 
 export type Query = {
+  __typename?: 'Query'
   login: Scalars['String']
   logout: Scalars['String']
   refresh?: Maybe<Scalars['String']>
   readFile?: Maybe<File>
   listFiles: ModelFileConnection
+  readCommit?: Maybe<Scalars['String']>
   readImage?: Maybe<File>
   listImages: ModelFileConnection
   readRepo?: Maybe<Repo>
   listRepos: ModelRepoConnection
-  readGithubUser?: Maybe<GithubUser>
   readGithubUserAccessToken: Scalars['String']
+  readGithubUser?: Maybe<GithubUser>
 }
 
 export type QueryReadFileArgs = {
@@ -135,6 +142,12 @@ export type QueryReadFileArgs = {
 export type QueryListFilesArgs = {
   username: Scalars['String']
   repo: Scalars['String']
+}
+
+export type QueryReadCommitArgs = {
+  username: Scalars['String']
+  repo: Scalars['String']
+  filename: Scalars['String']
 }
 
 export type QueryReadImageArgs = {
@@ -159,6 +172,7 @@ export type QueryReadGithubUserAccessTokenArgs = {
 }
 
 export type Repo = {
+  __typename?: 'Repo'
   id: Scalars['Int']
   node_id: Scalars['String']
   name: Scalars['String']
@@ -398,6 +412,12 @@ export type QueryResolvers<
     Context,
     QueryListFilesArgs
   >
+  readCommit?: Resolver<
+    Maybe<ResolversTypes['String']>,
+    ParentType,
+    Context,
+    QueryReadCommitArgs
+  >
   readImage?: Resolver<
     Maybe<ResolversTypes['File']>,
     ParentType,
@@ -421,16 +441,16 @@ export type QueryResolvers<
     ParentType,
     Context
   >
-  readGithubUser?: Resolver<
-    Maybe<ResolversTypes['GithubUser']>,
-    ParentType,
-    Context
-  >
   readGithubUserAccessToken?: Resolver<
     ResolversTypes['String'],
     ParentType,
     Context,
     QueryReadGithubUserAccessTokenArgs
+  >
+  readGithubUser?: Resolver<
+    Maybe<ResolversTypes['GithubUser']>,
+    ParentType,
+    Context
   >
 }
 

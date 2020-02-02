@@ -5,6 +5,7 @@ import {
   MutationDeleteFileArgs,
   MutationUpdateFileArgs,
   QueryListFilesArgs,
+  QueryReadCommitArgs,
   QueryReadFileArgs,
 } from '../resolvers-types'
 
@@ -28,6 +29,14 @@ export const FileQueries = {
     return {
       items: files.filter(file => file.filename.includes('.md')),
     }
+  },
+  async readCommit(
+    _: any,
+    { repo, username, filename }: QueryReadCommitArgs,
+    { dataSources: { fileManager } }: IContext
+  ): Promise<string> {
+    const files = await fileManager.readCommit(username, repo, filename)
+    return files
   },
 }
 

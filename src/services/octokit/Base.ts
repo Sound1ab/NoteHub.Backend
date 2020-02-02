@@ -1,4 +1,5 @@
 import { DataSourceConfig } from 'apollo-datasource/src/index'
+import { GraphQLClient } from 'graphql-request'
 import { IContext } from '../../server'
 import { JwtManager } from '..'
 import Octokit from '@octokit/rest'
@@ -8,13 +9,15 @@ import { decrypt } from '../../utils'
 
 const octokitWithThrottle = Octokit.plugin(Throttle)
 
+const jwtManager = new JwtManager()
+
 export class Github {
   public static encodeToBase64(str: string) {
-    return Buffer.from(str, 'binary').toString('base64')
+    return Buffer.from(str).toString('base64')
   }
 
   public static decodeFromBase64(str: string) {
-    return Buffer.from(str, 'base64').toString('ascii')
+    return Buffer.from(str, 'base64').toString()
   }
 
   public static formCommitMessage(
@@ -25,25 +28,30 @@ export class Github {
   }
 
   public octokit: Octokit
+  public graphql: any
   public repoNamespace = 'NoteHub'
   private userAgent = 'noted-api-v1'
 
   // Config is passed by Apollo when added as a DataSource in Apollo Server
   public initialize({ context: { jwt } }: DataSourceConfig<IContext>): void {
-    const jwtManager = new JwtManager()
-    let accessToken: string
+    const accessToken = this.getAccessToken(jwt)
 
-    if (jwt) {
-      const {
-        body: { accessToken: encryptedAccessToken, iv },
-      } = jwtManager.getJwtValues(jwt)
+    this.octokit = this.initOctokit(accessToken)
+    this.graphql = this.initGraphQL(accessToken)
+  }
 
-      accessToken = decrypt(encryptedAccessToken, iv)
-    } else {
-      accessToken = ''
-    }
+  private initGraphQL(accessToken: string) {
+    const endpoint = 'https://api.github.com/graphql'
 
-    this.octokit = new octokitWithThrottle({
+    return new GraphQLClient(endpoint, {
+      headers: {
+        Authorization: `bearer ${accessToken}`,
+      },
+    })
+  }
+
+  private initOctokit(accessToken: string) {
+    return new octokitWithThrottle({
       auth: `token ${accessToken}`,
       throttle: {
         onAbuseLimit: (_: any, options: any) => {
@@ -66,5 +74,17 @@ export class Github {
       },
       userAgent: this.userAgent,
     })
+  }
+
+  private getAccessToken(jwt: string | null) {
+    if (!jwt) {
+      return ''
+    }
+
+    const {
+      body: { accessToken: encryptedAccessToken, iv },
+    } = jwtManager.getJwtValues(jwt)
+
+    return decrypt(encryptedAccessToken, iv)
   }
 }

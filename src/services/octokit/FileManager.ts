@@ -1,5 +1,6 @@
 import { File, UpdateFileInput } from '../../resolvers-types'
 
+import { GetCommit } from '../../queries/GetCommit'
 import { Github } from './Base'
 import Octokit from '@octokit/rest'
 
@@ -50,8 +51,12 @@ export class FileManager extends Github {
     } catch (error) {
       // First time creating a repo and no new files have been added yet
       if (error.message === 'This repository is empty.') {
-        const file = await this.createFile(owner, repo, this.readme, `# ${repo}`)
-        console.log('file', file)
+        const file = await this.createFile(
+          owner,
+          repo,
+          this.readme,
+          `# ${repo}`
+        )
         return [{ ...file, repo }]
       }
       if (
@@ -140,5 +145,15 @@ export class FileManager extends Github {
       sha: file.sha,
     })
     return { ...file, repo }
+  }
+
+  public async readCommit(
+    owner: string,
+    repo: string,
+    filename: string
+  ): Promise<string> {
+    const file = await this.graphql.request(GetCommit)
+    console.log('here', file)
+    return 'here'
   }
 }
