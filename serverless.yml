@@ -14,7 +14,6 @@ provider:
   region: eu-west-1
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}-refresh-tokens
-  # NOTE: This needs to be way more secure
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -51,7 +50,8 @@ functions:
           cors:
             origins:
               - 'http://noted-development.s3-website-eu-west-1.amazonaws.com'
-              - 'http://noted-master.s3-website-eu-west-1.amazonaws.com'
+              - 'https://notehub.xyz'
+              - 'https://www.notehub.xyz'
             allowCredentials: true
 
 resources:
