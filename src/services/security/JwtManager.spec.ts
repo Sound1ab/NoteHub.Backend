@@ -1,9 +1,6 @@
 import { DynamoManager } from '..'
 import { JwtManager } from './JwtManager'
 
-process.env.DYNAMODB_TABLE = 'mock'
-process.env.SERVERLESS_APP_JWT_SIGNING_KEY = '1234'
-
 jest.mock('../aws/DynamoManager')
 
 describe('JwtManager', () => {

@@ -153,7 +153,6 @@ export class FileManager extends Github {
     filename: string
   ): Promise<string> {
     const file = await this.graphql.request(GetCommit)
-    console.log('here', file)
-    return 'here'
+    return `${owner} - ${repo} - ${filename} - ${file.toString()}`
   }
 }
