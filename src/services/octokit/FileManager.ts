@@ -1,8 +1,9 @@
-import { File, UpdateFileInput } from '../../resolvers-types'
+import { File, Node, UpdateFileInput } from '../../resolvers-types'
 
 import { GetCommit } from '../../queries/GetCommit'
 import { Github } from './Base'
 import Octokit from '@octokit/rest'
+import { createTreeBeard } from '../../utils/tree'
 
 export class FileManager extends Github {
   private readme = 'README.md'
@@ -147,12 +148,29 @@ export class FileManager extends Github {
     return { ...file, repo }
   }
 
-  public async readCommit(
-    owner: string,
-    repo: string,
-    filename: string
-  ): Promise<string> {
-    const file = await this.graphql.request(GetCommit)
-    return `${owner} - ${repo} - ${filename} - ${file.toString()}`
+  public async readTree(owner: string, repo: string): Promise<Node> {
+    const {
+      repository: {
+        object: {
+          history: {
+            nodes: [{ oid }],
+          },
+        },
+      },
+    } = await this.graphql.request(GetCommit, {
+      name: repo,
+      owner,
+    })
+
+    const {
+      data: { tree },
+    } = await this.octokit.git.getTree({
+      owner,
+      recursive: 1,
+      repo,
+      tree_sha: oid,
+    })
+
+    return createTreeBeard(tree)
   }
 }

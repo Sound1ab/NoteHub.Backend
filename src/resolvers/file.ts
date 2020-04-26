@@ -4,9 +4,10 @@ import {
   MutationCreateFileArgs,
   MutationDeleteFileArgs,
   MutationUpdateFileArgs,
+  Node,
   QueryListFilesArgs,
-  QueryReadCommitArgs,
   QueryReadFileArgs,
+  QueryReadTreeArgs,
 } from '../resolvers-types'
 
 import { IContext } from '../server'
@@ -30,13 +31,12 @@ export const FileQueries = {
       items: files.filter(file => file.filename.includes('.md')),
     }
   },
-  async readCommit(
+  async readTree(
     _: any,
-    { repo, username, filename }: QueryReadCommitArgs,
+    { repo, username }: QueryReadTreeArgs,
     { dataSources: { fileManager } }: IContext
-  ): Promise<string> {
-    const files = await fileManager.readCommit(username, repo, filename)
-    return files
+  ): Promise<Node> {
+    return fileManager.readTree(username, repo)
   },
 }
 

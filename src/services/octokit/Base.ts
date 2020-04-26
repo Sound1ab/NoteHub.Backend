@@ -28,7 +28,7 @@ export class Github {
   }
 
   public octokit: Octokit
-  public graphql: any
+  public graphql: GraphQLClient
   public repoNamespace = 'NoteHub'
   private userAgent = 'noted-api-v1'
 

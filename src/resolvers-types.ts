@@ -117,14 +117,21 @@ export type MutationDeleteRepoArgs = {
   input: DeleteRepoInput
 }
 
+export type Node = {
+  __typename?: 'Node'
+  name: Scalars['String']
+  toggled: Scalars['Boolean']
+  children?: Maybe<Array<Maybe<Node>>>
+}
+
 export type Query = {
   __typename?: 'Query'
   login: Scalars['String']
   logout: Scalars['String']
   refresh?: Maybe<Scalars['String']>
   readFile?: Maybe<File>
+  readTree: Node
   listFiles: ModelFileConnection
-  readCommit?: Maybe<Scalars['String']>
   readImage?: Maybe<File>
   listImages: ModelFileConnection
   readRepo?: Maybe<Repo>
@@ -139,15 +146,14 @@ export type QueryReadFileArgs = {
   filename: Scalars['String']
 }
 
-export type QueryListFilesArgs = {
+export type QueryReadTreeArgs = {
   username: Scalars['String']
   repo: Scalars['String']
 }
 
-export type QueryReadCommitArgs = {
+export type QueryListFilesArgs = {
   username: Scalars['String']
   repo: Scalars['String']
-  filename: Scalars['String']
 }
 
 export type QueryReadImageArgs = {
@@ -273,10 +279,11 @@ export type ResolversTypes = {
   String: Scalars['String']
   File: File
   Links: Links
+  Node: Node
+  Boolean: Scalars['Boolean']
   ModelFileConnection: ModelFileConnection
   Repo: Repo
   Int: Scalars['Int']
-  Boolean: Scalars['Boolean']
   ModelRepoConnection: ModelRepoConnection
   GithubUser: GithubUser
   Mutation: Mutation
@@ -393,6 +400,19 @@ export type MutationResolvers<
   >
 }
 
+export type NodeResolvers<
+  Context = any,
+  ParentType = ResolversTypes['Node']
+> = {
+  name?: Resolver<ResolversTypes['String'], ParentType, Context>
+  toggled?: Resolver<ResolversTypes['Boolean'], ParentType, Context>
+  children?: Resolver<
+    Maybe<Array<Maybe<ResolversTypes['Node']>>>,
+    ParentType,
+    Context
+  >
+}
+
 export type QueryResolvers<
   Context = any,
   ParentType = ResolversTypes['Query']
@@ -406,17 +426,17 @@ export type QueryResolvers<
     Context,
     QueryReadFileArgs
   >
+  readTree?: Resolver<
+    ResolversTypes['Node'],
+    ParentType,
+    Context,
+    QueryReadTreeArgs
+  >
   listFiles?: Resolver<
     ResolversTypes['ModelFileConnection'],
     ParentType,
     Context,
     QueryListFilesArgs
-  >
-  readCommit?: Resolver<
-    Maybe<ResolversTypes['String']>,
-    ParentType,
-    Context,
-    QueryReadCommitArgs
   >
   readImage?: Resolver<
     Maybe<ResolversTypes['File']>,
@@ -473,6 +493,7 @@ export type Resolvers<Context = any> = {
   ModelFileConnection?: ModelFileConnectionResolvers<Context>
   ModelRepoConnection?: ModelRepoConnectionResolvers<Context>
   Mutation?: MutationResolvers<Context>
+  Node?: NodeResolvers<Context>
   Query?: QueryResolvers<Context>
   Repo?: RepoResolvers<Context>
 }

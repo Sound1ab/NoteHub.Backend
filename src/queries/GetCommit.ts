@@ -1,16 +1,11 @@
 export const GetCommit = `
-  query getCommitDate {
-    repository(owner: "Sound1ab", name: "NoteHub.testing") {
-      folder: object(expression: "master:") {
-        ... on Tree {
-          entries {
-            name
-            object {
+  query GetCommit($owner: String!, $name: String!) {
+    repository(owner: $owner, name: $name) {
+      object(expression: "master") {
+        ... on Commit {
+          history(first: 1) {
+            nodes {
               oid
-              id
-              ... on Blob {
-                text
-              }
             }
           }
         }

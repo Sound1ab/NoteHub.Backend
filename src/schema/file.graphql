@@ -1,8 +1,8 @@
 ## Base
 extend type Query {
   readFile(username: String!, repo: String!, filename: String!): File
+  readTree(username: String!, repo: String!): Node!
   listFiles(username: String!, repo: String!): ModelFileConnection!
-  readCommit(username: String!, repo: String!, filename: String!): String
 }
 
 extend type Mutation {
@@ -24,6 +24,12 @@ type File {
   sha: String!
   _links: Links!
   repo: String!
+}
+
+type Node {
+  name: String!
+  toggled: Boolean!
+  children: [Node]
 }
 
 ## Query outputs
