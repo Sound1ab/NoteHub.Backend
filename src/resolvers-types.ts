@@ -63,6 +63,11 @@ export type ModelFileConnection = {
   items: Array<File>
 }
 
+export type ModelNodeConnection = {
+  __typename?: 'ModelNodeConnection'
+  nodes: Array<Node>
+}
+
 export type ModelRepoConnection = {
   __typename?: 'ModelRepoConnection'
   items: Array<Repo>
@@ -121,7 +126,7 @@ export type Node = {
   __typename?: 'Node'
   name: Scalars['String']
   toggled: Scalars['Boolean']
-  children?: Maybe<Array<Maybe<Node>>>
+  children?: Maybe<Array<Maybe<Array<Node>>>>
 }
 
 export type Query = {
@@ -130,7 +135,7 @@ export type Query = {
   logout: Scalars['String']
   refresh?: Maybe<Scalars['String']>
   readFile?: Maybe<File>
-  readTree: Node
+  readTree: ModelNodeConnection
   listFiles: ModelFileConnection
   readImage?: Maybe<File>
   listImages: ModelFileConnection
@@ -279,6 +284,7 @@ export type ResolversTypes = {
   String: Scalars['String']
   File: File
   Links: Links
+  ModelNodeConnection: ModelNodeConnection
   Node: Node
   Boolean: Scalars['Boolean']
   ModelFileConnection: ModelFileConnection
@@ -331,6 +337,13 @@ export type ModelFileConnectionResolvers<
   ParentType = ResolversTypes['ModelFileConnection']
 > = {
   items?: Resolver<Array<ResolversTypes['File']>, ParentType, Context>
+}
+
+export type ModelNodeConnectionResolvers<
+  Context = any,
+  ParentType = ResolversTypes['ModelNodeConnection']
+> = {
+  nodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, Context>
 }
 
 export type ModelRepoConnectionResolvers<
@@ -407,7 +420,7 @@ export type NodeResolvers<
   name?: Resolver<ResolversTypes['String'], ParentType, Context>
   toggled?: Resolver<ResolversTypes['Boolean'], ParentType, Context>
   children?: Resolver<
-    Maybe<Array<Maybe<ResolversTypes['Node']>>>,
+    Maybe<Array<Maybe<Array<ResolversTypes['Node']>>>>,
     ParentType,
     Context
   >
@@ -427,7 +440,7 @@ export type QueryResolvers<
     QueryReadFileArgs
   >
   readTree?: Resolver<
-    ResolversTypes['Node'],
+    ResolversTypes['ModelNodeConnection'],
     ParentType,
     Context,
     QueryReadTreeArgs
@@ -491,6 +504,7 @@ export type Resolvers<Context = any> = {
   GithubUser?: GithubUserResolvers<Context>
   Links?: LinksResolvers<Context>
   ModelFileConnection?: ModelFileConnectionResolvers<Context>
+  ModelNodeConnection?: ModelNodeConnectionResolvers<Context>
   ModelRepoConnection?: ModelRepoConnectionResolvers<Context>
   Mutation?: MutationResolvers<Context>
   Node?: NodeResolvers<Context>

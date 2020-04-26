@@ -1,10 +1,10 @@
 import {
   File,
   ModelFileConnection,
+  ModelNodeConnection,
   MutationCreateFileArgs,
   MutationDeleteFileArgs,
   MutationUpdateFileArgs,
-  Node,
   QueryListFilesArgs,
   QueryReadFileArgs,
   QueryReadTreeArgs,
@@ -35,7 +35,7 @@ export const FileQueries = {
     _: any,
     { repo, username }: QueryReadTreeArgs,
     { dataSources: { fileManager } }: IContext
-  ): Promise<Node> {
+  ): Promise<ModelNodeConnection> {
     return fileManager.readTree(username, repo)
   },
 }

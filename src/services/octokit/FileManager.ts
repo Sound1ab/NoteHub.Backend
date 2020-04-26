@@ -1,4 +1,8 @@
-import { File, Node, UpdateFileInput } from '../../resolvers-types'
+import {
+  File,
+  ModelNodeConnection,
+  UpdateFileInput,
+} from '../../resolvers-types'
 
 import { GetCommit } from '../../queries/GetCommit'
 import { Github } from './Base'
@@ -148,7 +152,10 @@ export class FileManager extends Github {
     return { ...file, repo }
   }
 
-  public async readTree(owner: string, repo: string): Promise<Node> {
+  public async readTree(
+    owner: string,
+    repo: string
+  ): Promise<ModelNodeConnection> {
     const {
       repository: {
         object: {
@@ -171,6 +178,10 @@ export class FileManager extends Github {
       tree_sha: oid,
     })
 
-    return createTreeBeard(tree)
+    const treeBeard = createTreeBeard(tree)
+
+    return {
+      nodes: treeBeard.children,
+    }
   }
 }

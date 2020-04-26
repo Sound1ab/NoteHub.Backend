@@ -1,7 +1,7 @@
 ## Base
 extend type Query {
   readFile(username: String!, repo: String!, filename: String!): File
-  readTree(username: String!, repo: String!): Node!
+  readTree(username: String!, repo: String!): ModelNodeConnection!
   listFiles(username: String!, repo: String!): ModelFileConnection!
 }
 
@@ -29,10 +29,14 @@ type File {
 type Node {
   name: String!
   toggled: Boolean!
-  children: [Node]
+  children: [Node!]
 }
 
 ## Query outputs
+type ModelNodeConnection {
+  nodes: [Node!]!
+}
+
 type ModelFileConnection {
   items: [File!]!
 }
