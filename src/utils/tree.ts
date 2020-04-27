@@ -1,17 +1,27 @@
 import { GitCreateTreeResponseTreeItem } from '@octokit/rest'
 
-export function createFolderNode(name: string) {
+export function createFolderNode(
+  name: string,
+  { path, type }: GitCreateTreeResponseTreeItem
+) {
   return {
     children: [],
     name,
+    path,
     toggled: true,
+    type,
   }
 }
 
-export function createFileNode(name: string) {
+export function createFileNode(
+  name: string,
+  { path, type }: GitCreateTreeResponseTreeItem
+) {
   return {
     name,
+    path,
     toggled: true,
+    type,
   }
 }
 
@@ -19,17 +29,23 @@ interface INode {
   name: string
   toggled: boolean
   children?: INode[]
+  path: string
+  type: string
 }
 
 export function createTreeBeard(tree: GitCreateTreeResponseTreeItem[]) {
-  const treeBeard: any = {
+  const treeBeard: INode = {
     children: [],
     name: 'root',
+    path: '/',
     toggled: true,
+    type: 'tree',
   }
 
-  for (const { path, type } of tree) {
-    updateNode(path.split('/'), type, treeBeard)
+  for (const gitNode of tree) {
+    const { path, type } = gitNode
+
+    updateNode(path.split('/'), type, treeBeard, gitNode)
   }
 
   return treeBeard
@@ -38,7 +54,8 @@ export function createTreeBeard(tree: GitCreateTreeResponseTreeItem[]) {
 export function updateNode(
   path: string[],
   type: string,
-  currentNode: INode
+  currentNode: INode,
+  gitNode: GitCreateTreeResponseTreeItem
 ): void {
   if (path.length === 1) {
     const [name] = path
@@ -49,7 +66,9 @@ export function updateNode(
 
     currentNode.children = [
       ...children,
-      isFolder ? createFolderNode(name) : createFileNode(name),
+      isFolder
+        ? createFolderNode(name, gitNode)
+        : createFileNode(name, gitNode),
     ]
     return
   }
@@ -66,5 +85,5 @@ export function updateNode(
     throw new Error('Unable to find next node')
   }
 
-  return updateNode(rest, type, nextNode)
+  return updateNode(rest, type, nextNode, gitNode)
 }

@@ -1,4 +1,4 @@
-const rootFile = {
+export const rootFile = {
   mode: '100644',
   path: 'README.md',
   sha: '21e60f8358c6175f2efbbe34808a4d99d12d18ee',
@@ -28,7 +28,7 @@ const fileDepthTwo = {
     'https://api.github.com/repos/Sound1ab/NoteHub.Test/git/blobs/1385f264afb75a56a5bec74243be9b367ba4ca08',
 }
 
-const rootFolder = {
+export const rootFolder = {
   mode: '040000',
   path: 'folder',
   sha: '440bcc562c69b0ccb7e71d54f57a0d802447b60d',
@@ -60,29 +60,41 @@ export const treeBeard = {
   children: [
     {
       name: 'README.md',
+      path: 'README.md',
       toggled: true,
+      type: 'blob',
     },
     {
       children: [
         {
           name: 'file.md',
+          path: 'folder/file.md',
           toggled: true,
+          type: 'blob',
         },
         {
           children: [
             {
               name: 'file2.md',
+              path: 'folder/folder2/file2.md',
               toggled: true,
+              type: 'blob',
             },
           ],
           name: 'folder2',
+          path: 'folder/folder2',
           toggled: true,
+          type: 'tree',
         },
       ],
       name: 'folder',
+      path: 'folder',
       toggled: true,
+      type: 'tree',
     },
   ],
   name: 'root',
+  path: '/',
   toggled: true,
+  type: 'tree',
 }

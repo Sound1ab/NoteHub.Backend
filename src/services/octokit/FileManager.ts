@@ -180,6 +180,10 @@ export class FileManager extends Github {
 
     const treeBeard = createTreeBeard(tree)
 
+    if (!treeBeard.children) {
+      throw new Error('treebeard root does not have child')
+    }
+
     return {
       nodes: treeBeard.children,
     }

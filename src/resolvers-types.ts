@@ -126,7 +126,9 @@ export type Node = {
   __typename?: 'Node'
   name: Scalars['String']
   toggled: Scalars['Boolean']
-  children?: Maybe<Array<Maybe<Array<Node>>>>
+  type: Scalars['String']
+  path: Scalars['String']
+  children?: Maybe<Array<Node>>
 }
 
 export type Query = {
@@ -419,11 +421,9 @@ export type NodeResolvers<
 > = {
   name?: Resolver<ResolversTypes['String'], ParentType, Context>
   toggled?: Resolver<ResolversTypes['Boolean'], ParentType, Context>
-  children?: Resolver<
-    Maybe<Array<Maybe<Array<ResolversTypes['Node']>>>>,
-    ParentType,
-    Context
-  >
+  type?: Resolver<ResolversTypes['String'], ParentType, Context>
+  path?: Resolver<ResolversTypes['String'], ParentType, Context>
+  children?: Resolver<Maybe<Array<ResolversTypes['Node']>>, ParentType, Context>
 }
 
 export type QueryResolvers<

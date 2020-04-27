@@ -29,6 +29,8 @@ type File {
 type Node {
   name: String!
   toggled: Boolean!
+  type: String!
+  path: String!
   children: [Node!]
 }
 
