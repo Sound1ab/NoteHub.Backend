@@ -1,8 +1,8 @@
 ## Base
 extend type Query {
-  readFile(username: String!, repo: String!, filename: String!): File
-  readTree(username: String!, repo: String!): ModelNodeConnection!
-  listFiles(username: String!, repo: String!): ModelFileConnection!
+  readFile(path: String!): File
+  readTree: ModelNodeConnection!
+  listFiles: ModelFileConnection!
 }
 
 extend type Mutation {
@@ -45,21 +45,15 @@ type ModelFileConnection {
 
 ## Mutation inputs
 input CreateFileInput {
-  username: String!
-  repo: String!
-  filename: String!
+  path: String!
   content: String
 }
 
 input UpdateFileInput {
-  username: String!
-  repo: String!
-  filename: String!
+  path: String!
   content: String
 }
 
 input DeleteFileInput {
-  username: String!
-  repo: String!
-  filename: String!
+  path: String!
 }

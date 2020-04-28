@@ -34,6 +34,7 @@ export interface IContext {
   context: Record<string, any>
   jwt: string | null
   cookie: string | null
+  owner: string | null
   dataSources: {
     fileManager: FileManager
     jwtManager: JwtManager
@@ -67,6 +68,7 @@ export function configureServer() {
     }) => {
       const bearerToken = event.headers?.Authorization ?? ''
       const cookie = event.headers?.Cookie ?? null
+      const owner = event.headers?.Owner ?? null
 
       let jwt: string | null = null
 
@@ -78,6 +80,7 @@ export function configureServer() {
         context,
         cookie,
         jwt,
+        owner,
       }
     },
     dataSources: () => {

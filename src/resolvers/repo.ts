@@ -1,9 +1,6 @@
 import {
   ModelRepoConnection,
-  MutationCreateRepoArgs,
-  MutationDeleteRepoArgs,
   MutationUpdateRepoArgs,
-  QueryReadRepoArgs,
   Repo,
 } from '../resolvers-types'
 
@@ -12,30 +9,20 @@ import { IContext } from '../server'
 export const RepoQueries = {
   async readRepo(
     _: any,
-    { username, repo }: QueryReadRepoArgs,
-    { dataSources: { repoManager } }: IContext
-  ): Promise<Repo> {
-    return repoManager.readRepo(username, repo)
-  },
-  async listRepos(
-    _0: any,
     _1: any,
     { dataSources: { repoManager } }: IContext
-  ): Promise<ModelRepoConnection> {
-    const repos = await repoManager.listRepos()
-    return {
-      items: repos,
-    }
+  ): Promise<Repo> {
+    return repoManager.readRepo()
   },
 }
 
 export const RepoMutations = {
   async createRepo(
     _: any,
-    { input }: MutationCreateRepoArgs,
+    _1: any,
     { dataSources: { repoManager } }: IContext
   ): Promise<Repo> {
-    return repoManager.createRepo(input.name, input.description, input.private)
+    return repoManager.createRepo()
   },
   async updateRepo(
     _: any,
@@ -46,9 +33,9 @@ export const RepoMutations = {
   },
   async deleteRepo(
     _: any,
-    { input }: MutationDeleteRepoArgs,
+    _1: any,
     { dataSources: { repoManager } }: IContext
   ): Promise<Repo> {
-    return repoManager.deleteRepo(input.username, input.repo)
+    return repoManager.deleteRepo()
   },
 }

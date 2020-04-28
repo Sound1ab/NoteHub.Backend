@@ -29,15 +29,20 @@ export class Github {
 
   public octokit: Octokit
   public graphql: GraphQLClient
-  public repoNamespace = 'NoteHub'
+  public repo = 'NoteHub.Notebook'
+  public owner: string
   private userAgent = 'noted-api-v1'
 
   // Config is passed by Apollo when added as a DataSource in Apollo Server
-  public initialize({ context: { jwt } }: DataSourceConfig<IContext>): void {
+  public initialize({
+    context: { jwt, owner },
+  }: DataSourceConfig<IContext>): void {
     const accessToken = this.getAccessToken(jwt)
 
     this.octokit = this.initOctokit(accessToken)
     this.graphql = this.initGraphQL(accessToken)
+
+    this.owner = owner ?? ''
   }
 
   private initGraphQL(accessToken: string) {

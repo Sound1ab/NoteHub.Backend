@@ -10,27 +10,12 @@ export type Scalars = {
 }
 
 export type CreateFileInput = {
-  username: Scalars['String']
-  repo: Scalars['String']
-  filename: Scalars['String']
+  path: Scalars['String']
   content?: Maybe<Scalars['String']>
 }
 
-export type CreateRepoInput = {
-  name: Scalars['String']
-  description?: Maybe<Scalars['String']>
-  private?: Maybe<Scalars['Boolean']>
-}
-
 export type DeleteFileInput = {
-  username: Scalars['String']
-  repo: Scalars['String']
-  filename: Scalars['String']
-}
-
-export type DeleteRepoInput = {
-  username: Scalars['String']
-  repo: Scalars['String']
+  path: Scalars['String']
 }
 
 export type File = {
@@ -110,16 +95,8 @@ export type MutationDeleteImageArgs = {
   input: DeleteFileInput
 }
 
-export type MutationCreateRepoArgs = {
-  input: CreateRepoInput
-}
-
 export type MutationUpdateRepoArgs = {
   input: UpdateRepoInput
-}
-
-export type MutationDeleteRepoArgs = {
-  input: DeleteRepoInput
 }
 
 export type Node = {
@@ -142,41 +119,16 @@ export type Query = {
   readImage?: Maybe<File>
   listImages: ModelFileConnection
   readRepo?: Maybe<Repo>
-  listRepos: ModelRepoConnection
   readGithubUserAccessToken: Scalars['String']
   readGithubUser?: Maybe<GithubUser>
 }
 
 export type QueryReadFileArgs = {
-  username: Scalars['String']
-  repo: Scalars['String']
-  filename: Scalars['String']
-}
-
-export type QueryReadTreeArgs = {
-  username: Scalars['String']
-  repo: Scalars['String']
-}
-
-export type QueryListFilesArgs = {
-  username: Scalars['String']
-  repo: Scalars['String']
+  path: Scalars['String']
 }
 
 export type QueryReadImageArgs = {
-  username: Scalars['String']
-  repo: Scalars['String']
-  filename: Scalars['String']
-}
-
-export type QueryListImagesArgs = {
-  username: Scalars['String']
-  repo: Scalars['String']
-}
-
-export type QueryReadRepoArgs = {
-  username: Scalars['String']
-  repo: Scalars['String']
+  path: Scalars['String']
 }
 
 export type QueryReadGithubUserAccessTokenArgs = {
@@ -195,16 +147,11 @@ export type Repo = {
 }
 
 export type UpdateFileInput = {
-  username: Scalars['String']
-  repo: Scalars['String']
-  filename: Scalars['String']
+  path: Scalars['String']
   content?: Maybe<Scalars['String']>
 }
 
 export type UpdateRepoInput = {
-  username: Scalars['String']
-  repo: Scalars['String']
-  name?: Maybe<Scalars['String']>
   description?: Maybe<Scalars['String']>
   private?: Maybe<Scalars['Boolean']>
 }
@@ -292,15 +239,13 @@ export type ResolversTypes = {
   ModelFileConnection: ModelFileConnection
   Repo: Repo
   Int: Scalars['Int']
-  ModelRepoConnection: ModelRepoConnection
   GithubUser: GithubUser
   Mutation: Mutation
   CreateFileInput: CreateFileInput
   UpdateFileInput: UpdateFileInput
   DeleteFileInput: DeleteFileInput
-  CreateRepoInput: CreateRepoInput
   UpdateRepoInput: UpdateRepoInput
-  DeleteRepoInput: DeleteRepoInput
+  ModelRepoConnection: ModelRepoConnection
 }
 
 export type FileResolvers<
@@ -395,24 +340,14 @@ export type MutationResolvers<
     Context,
     MutationDeleteImageArgs
   >
-  createRepo?: Resolver<
-    Maybe<ResolversTypes['Repo']>,
-    ParentType,
-    Context,
-    MutationCreateRepoArgs
-  >
+  createRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>
   updateRepo?: Resolver<
     Maybe<ResolversTypes['Repo']>,
     ParentType,
     Context,
     MutationUpdateRepoArgs
   >
-  deleteRepo?: Resolver<
-    Maybe<ResolversTypes['Repo']>,
-    ParentType,
-    Context,
-    MutationDeleteRepoArgs
-  >
+  deleteRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>
 }
 
 export type NodeResolvers<
@@ -442,14 +377,12 @@ export type QueryResolvers<
   readTree?: Resolver<
     ResolversTypes['ModelNodeConnection'],
     ParentType,
-    Context,
-    QueryReadTreeArgs
+    Context
   >
   listFiles?: Resolver<
     ResolversTypes['ModelFileConnection'],
     ParentType,
-    Context,
-    QueryListFilesArgs
+    Context
   >
   readImage?: Resolver<
     Maybe<ResolversTypes['File']>,
@@ -460,20 +393,9 @@ export type QueryResolvers<
   listImages?: Resolver<
     ResolversTypes['ModelFileConnection'],
     ParentType,
-    Context,
-    QueryListImagesArgs
-  >
-  readRepo?: Resolver<
-    Maybe<ResolversTypes['Repo']>,
-    ParentType,
-    Context,
-    QueryReadRepoArgs
-  >
-  listRepos?: Resolver<
-    ResolversTypes['ModelRepoConnection'],
-    ParentType,
     Context
   >
+  readRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>
   readGithubUserAccessToken?: Resolver<
     ResolversTypes['String'],
     ParentType,

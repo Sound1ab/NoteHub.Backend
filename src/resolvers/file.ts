@@ -5,9 +5,7 @@ import {
   MutationCreateFileArgs,
   MutationDeleteFileArgs,
   MutationUpdateFileArgs,
-  QueryListFilesArgs,
   QueryReadFileArgs,
-  QueryReadTreeArgs,
 } from '../resolvers-types'
 
 import { IContext } from '../server'
@@ -15,17 +13,17 @@ import { IContext } from '../server'
 export const FileQueries = {
   async readFile(
     _: any,
-    { filename, repo, username }: QueryReadFileArgs,
+    { path }: QueryReadFileArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
-    return fileManager.readFile(username, repo, filename)
+    return fileManager.readFile(path)
   },
   async listFiles(
     _: any,
-    { repo, username }: QueryListFilesArgs,
+    _1: any,
     { dataSources: { fileManager } }: IContext
   ): Promise<ModelFileConnection> {
-    const files = await fileManager.listFiles(username, repo)
+    const files = await fileManager.listFiles()
     // Todo: Move into markdown specific resolver
     return {
       items: files.filter(file => file.filename.includes('.md')),
@@ -33,20 +31,20 @@ export const FileQueries = {
   },
   async readTree(
     _: any,
-    { repo, username }: QueryReadTreeArgs,
+    _1: any,
     { dataSources: { fileManager } }: IContext
   ): Promise<ModelNodeConnection> {
-    return fileManager.readTree(username, repo)
+    return fileManager.readTree()
   },
 }
 
 export const FileMutations = {
   async createFile(
     _: any,
-    { input: { username, repo, filename, content } }: MutationCreateFileArgs,
+    { input: { path, content } }: MutationCreateFileArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
-    return fileManager.createFile(username, repo, filename, content)
+    return fileManager.createFile(path, content)
   },
   async updateFile(
     _: any,
@@ -57,9 +55,9 @@ export const FileMutations = {
   },
   async deleteFile(
     _: any,
-    { input: { filename, repo, username } }: MutationDeleteFileArgs,
+    { input: { path } }: MutationDeleteFileArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
-    return fileManager.deleteFile(username, repo, filename)
+    return fileManager.deleteFile(path)
   },
 }

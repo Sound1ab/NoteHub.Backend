@@ -4,7 +4,6 @@ import {
   MutationCreateImageArgs,
   MutationDeleteImageArgs,
   MutationUpdateImageArgs,
-  QueryListImagesArgs,
   QueryReadImageArgs,
 } from '../resolvers-types'
 
@@ -13,17 +12,17 @@ import { IContext } from '../server'
 export const ImageQueries = {
   async readImage(
     _: any,
-    { filename, repo, username }: QueryReadImageArgs,
+    { path }: QueryReadImageArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
-    return fileManager.readFile(username, repo, `images/${filename}`)
+    return fileManager.readFile(path)
   },
   async listImages(
     _: any,
-    { repo, username }: QueryListImagesArgs,
+    _1: any,
     { dataSources: { fileManager } }: IContext
   ): Promise<ModelFileConnection> {
-    const files = await fileManager.listFiles(username, repo, '/images')
+    const files = await fileManager.listFiles()
     return {
       items: files,
     }
@@ -33,10 +32,10 @@ export const ImageQueries = {
 export const ImageMutations = {
   async createImage(
     _: any,
-    { input: { username, repo, filename, content } }: MutationCreateImageArgs,
+    { input: { path, content } }: MutationCreateImageArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
-    return fileManager.createFile(username, repo, `images/${filename}`, content)
+    return fileManager.createFile(path, content)
   },
   async updateImage(
     _: any,
@@ -47,9 +46,9 @@ export const ImageMutations = {
   },
   async deleteImage(
     _: any,
-    { input: { filename, repo, username } }: MutationDeleteImageArgs,
+    { input: { path } }: MutationDeleteImageArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
-    return fileManager.deleteFile(username, repo, `images/${filename}`)
+    return fileManager.deleteFile(path)
   },
 }
