@@ -115,7 +115,6 @@ export type Query = {
   refresh?: Maybe<Scalars['String']>
   readFile?: Maybe<File>
   readTree: ModelNodeConnection
-  listFiles: ModelFileConnection
   readImage?: Maybe<File>
   listImages: ModelFileConnection
   readRepo?: Maybe<Repo>
@@ -376,11 +375,6 @@ export type QueryResolvers<
   >
   readTree?: Resolver<
     ResolversTypes['ModelNodeConnection'],
-    ParentType,
-    Context
-  >
-  listFiles?: Resolver<
-    ResolversTypes['ModelFileConnection'],
     ParentType,
     Context
   >

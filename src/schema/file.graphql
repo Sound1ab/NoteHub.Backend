@@ -2,7 +2,6 @@
 extend type Query {
   readFile(path: String!): File
   readTree: ModelNodeConnection!
-  listFiles: ModelFileConnection!
 }
 
 extend type Mutation {

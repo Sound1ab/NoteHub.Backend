@@ -28,36 +28,53 @@ export class FileManager extends Github {
     }
   }
 
-  public async listFiles(): Promise<File[]> {
+  public async readTree(): Promise<ModelNodeConnection> {
     try {
-      const { data } = await this.octokit.repos.getContents({
+      const {
+        repository: {
+          object: {
+            history: {
+              nodes: [{ oid }],
+            },
+          },
+        },
+      } = await this.graphql.request(GetCommit, {
+        name: this.repo,
         owner: this.owner,
-        path: '/',
-        repo: this.repo,
       })
-      // Files have been previously added but all have been deleted
-      if (data.length === 0) {
-        const file = await this.createFile(this.readme, '')
-        return [{ ...file, repo: this.repo }]
-      }
-      return data.map((file: Octokit.AnyResponse['data']) => ({
-        ...file,
-        filename: file.name,
+
+      const {
+        data: { tree },
+      } = await this.octokit.git.getTree({
+        owner: this.owner,
+        recursive: 1,
         repo: this.repo,
-      }))
+        tree_sha: oid,
+      })
+
+      const treeBeard = createTreeBeard(tree)
+
+      const nodes = treeBeard?.children ? treeBeard.children : []
+
+      return {
+        nodes,
+      }
     } catch (error) {
-      // First time creating a repo and no new files have been added yet
-      if (error.message === 'This repository is empty.') {
-        const file = await this.createFile(this.readme, `# ${this.repo}`)
-        return [{ ...file, repo: this.repo }]
+      // Repo has been setup but no changes have been made to it
+      if (error.message === "Cannot read property 'history' of null") {
+        return {
+          nodes: [],
+        }
       }
-      if (
-        error.message === 'Not Found' ||
-        error.message === 'Bad credentials'
-      ) {
-        throw error
+
+      // All files within the repo have been deleted
+      if (error.message === 'Not Found') {
+        return {
+          nodes: [],
+        }
       }
-      return []
+
+      throw new Error(error)
     }
   }
 
@@ -122,39 +139,5 @@ export class FileManager extends Github {
       sha: file.sha,
     })
     return { ...file, repo: this.repo }
-  }
-
-  public async readTree(): Promise<ModelNodeConnection> {
-    const {
-      repository: {
-        object: {
-          history: {
-            nodes: [{ oid }],
-          },
-        },
-      },
-    } = await this.graphql.request(GetCommit, {
-      name: this.repo,
-      owner: this.owner,
-    })
-
-    const {
-      data: { tree },
-    } = await this.octokit.git.getTree({
-      owner: this.owner,
-      recursive: 1,
-      repo: this.repo,
-      tree_sha: oid,
-    })
-
-    const treeBeard = createTreeBeard(tree)
-
-    if (!treeBeard.children) {
-      throw new Error('treebeard root does not have child')
-    }
-
-    return {
-      nodes: treeBeard.children,
-    }
   }
 }

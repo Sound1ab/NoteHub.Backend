@@ -18,17 +18,6 @@ export const FileQueries = {
   ): Promise<File> {
     return fileManager.readFile(path)
   },
-  async listFiles(
-    _: any,
-    _1: any,
-    { dataSources: { fileManager } }: IContext
-  ): Promise<ModelFileConnection> {
-    const files = await fileManager.listFiles()
-    // Todo: Move into markdown specific resolver
-    return {
-      items: files.filter(file => file.filename.includes('.md')),
-    }
-  },
   async readTree(
     _: any,
     _1: any,
