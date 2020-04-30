@@ -14,9 +14,13 @@ export const UserQueries = {
   ): Promise<string> {
     const accessToken = await userManager.readGithubUserAccessToken(code, state)
 
+    const owner = await userManager
+      .initOctokitWithAccessToken(accessToken)
+      .readUser()
+
     const { value, iv } = encrypt(accessToken)
 
-    const jwt = jwtManager.createJwtWithToken(value, iv).compact()
+    const jwt = jwtManager.createJwtWithToken(value, iv, owner).compact()
 
     const refreshToken = jwtManager.createRefreshToken()
 

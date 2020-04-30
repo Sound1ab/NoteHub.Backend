@@ -1,4 +1,9 @@
-import { addCookie, parseRefreshTokenFromCookie, removeCookie } from '../utils'
+import {
+  addCookie,
+  decrypt,
+  parseRefreshTokenFromCookie,
+  removeCookie,
+} from '../utils'
 
 import { AuthenticationError } from 'apollo-server-lambda'
 import { IContext } from '../server'
@@ -7,7 +12,7 @@ export const AuthorizationQueries = {
   async login(
     _0: any,
     _1: any,
-    { cookie, dataSources: { jwtManager } }: IContext
+    { cookie, dataSources: { jwtManager, userManager } }: IContext
   ): Promise<string> {
     if (!cookie) {
       throw new AuthenticationError('No cookie sent')
@@ -19,12 +24,20 @@ export const AuthorizationQueries = {
       refreshToken
     )
 
-    return jwtManager.createJwtWithToken(encryptedAccessToken, iv).compact()
+    const accessToken = decrypt(encryptedAccessToken, iv)
+
+    const owner = await userManager
+      .initOctokitWithAccessToken(accessToken)
+      .readUser()
+
+    return jwtManager
+      .createJwtWithToken(encryptedAccessToken, iv, owner)
+      .compact()
   },
   async refresh(
     _0: any,
     _1: any,
-    { context, cookie, dataSources: { jwtManager } }: IContext
+    { context, cookie, dataSources: { jwtManager, userManager } }: IContext
   ): Promise<string> {
     if (!cookie) {
       throw new AuthenticationError('No cookie sent')
@@ -32,14 +45,20 @@ export const AuthorizationQueries = {
 
     const refreshToken = parseRefreshTokenFromCookie(cookie)
 
-    const client = await jwtManager.getClient(refreshToken)
-
-    const { encryptedAccessToken, iv } = client
+    const { encryptedAccessToken, iv } = await jwtManager.getClient(
+      refreshToken
+    )
 
     await jwtManager.deleteClient(refreshToken)
 
+    const accessToken = decrypt(encryptedAccessToken, iv)
+
+    const owner = await userManager
+      .initOctokitWithAccessToken(accessToken)
+      .readUser()
+
     const regeneratedJwt = jwtManager
-      .createJwtWithToken(encryptedAccessToken, iv)
+      .createJwtWithToken(encryptedAccessToken, iv, owner)
       .compact()
 
     const regeneratedRefreshToken = jwtManager.createRefreshToken()

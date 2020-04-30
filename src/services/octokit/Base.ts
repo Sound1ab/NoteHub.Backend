@@ -45,6 +45,11 @@ export class Github {
     this.owner = owner ?? ''
   }
 
+  public initOctokitWithAccessToken(accessToken: string): this {
+    this.octokit = this.initOctokit(accessToken)
+    return this
+  }
+
   private initGraphQL(accessToken: string) {
     const endpoint = 'https://api.github.com/graphql'
 

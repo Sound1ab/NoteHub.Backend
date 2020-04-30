@@ -34,13 +34,24 @@ export class JwtManager {
     return
   }
 
-  public createJwtWithToken(encryptedAccessToken: string, iv: string) {
+  public createJwtWithToken(
+    encryptedAccessToken: string,
+    iv: string,
+    {
+      login,
+      avatar_url,
+      html_url,
+    }: { login: string; avatar_url: string; html_url: string }
+  ) {
     const jwtSigningKey = process.env.SERVERLESS_APP_JWT_SIGNING_KEY!
 
     const claims = {
       accessToken: encryptedAccessToken,
+      avatar_url,
+      html_url,
       iss: 'http://notehub.com/',
       iv,
+      login,
     }
 
     return nJwt.create(claims, jwtSigningKey)
