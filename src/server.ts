@@ -68,7 +68,7 @@ export function configureServer() {
     }) => {
       const bearerToken = event.headers?.Authorization ?? ''
       const cookie = event.headers?.Cookie ?? null
-      const owner = event.headers?.Owner ?? null
+      const owner = event.headers?.owner ?? null
 
       let jwt: string | null = null
 

@@ -53,6 +53,14 @@ functions:
               - 'https://notehub.xyz'
               - 'https://www.notehub.xyz'
             allowCredentials: true
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - Owner
 
 resources:
   Resources:

@@ -1,7 +1,6 @@
 ## Base
 extend type Query {
   readImage(path: String!): File
-  listImages: ModelFileConnection!
 }
 
 extend type Mutation {

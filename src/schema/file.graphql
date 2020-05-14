@@ -1,7 +1,7 @@
 ## Base
 extend type Query {
   readFile(path: String!): File
-  readTree: ModelNodeConnection!
+  readNodes: ModelNodeConnection!
 }
 
 extend type Mutation {
@@ -21,21 +21,20 @@ type File {
   content: String
   excerpt: String
   sha: String!
-  _links: Links!
-  repo: String!
+  type: NODE_TYPE!
+  url: String!
 }
 
-type Node {
-  name: String!
-  toggled: Boolean!
-  type: String!
+type GitNode {
   path: String!
-  children: [Node!]
+  type: NODE_TYPE!
+  sha: String!
+  url: String!
 }
 
 ## Query outputs
 type ModelNodeConnection {
-  nodes: [Node!]!
+  nodes: [GitNode!]!
 }
 
 type ModelFileConnection {
@@ -55,4 +54,10 @@ input UpdateFileInput {
 
 input DeleteFileInput {
   path: String!
+}
+
+## Enums
+enum NODE_TYPE {
+  FILE
+  FOLDER
 }

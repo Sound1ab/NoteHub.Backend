@@ -1,34 +1,41 @@
 import {
   File,
   ModelNodeConnection,
+  Node_Type,
   UpdateFileInput,
 } from '../../resolvers-types'
 
 import { GetCommit } from '../../queries/GetCommit'
+import { GitCreateTreeResponseTreeItem } from '@octokit/rest'
 import { Github } from './Base'
-import Octokit from '@octokit/rest'
-import { createTreeBeard } from '../../utils/tree'
 
 export class FileManager extends Github {
-  private readme = 'README.md'
-
   public async readFile(path: string): Promise<File> {
     const { data } = await this.octokit.repos.getContents({
       owner: this.owner,
       path,
       repo: this.repo,
     })
-    const content = Github.decodeFromBase64(data.content)
+
+    if (data.type === 'file') {
+      const content = Github.decodeFromBase64(data.content)
+      return {
+        ...data,
+        content,
+        excerpt: `${content.substring(0, 50)}...`,
+        filename: data.name,
+        type: Node_Type.File,
+      }
+    }
+
     return {
       ...data,
-      content,
-      excerpt: `${content.substring(0, 50)}...`,
       filename: data.name,
-      repo: this.repo,
+      type: Node_Type.Folder,
     }
   }
 
-  public async readTree(): Promise<ModelNodeConnection> {
+  public async readNodes(): Promise<ModelNodeConnection> {
     try {
       const {
         repository: {
@@ -52,12 +59,13 @@ export class FileManager extends Github {
         tree_sha: oid,
       })
 
-      const treeBeard = createTreeBeard(tree)
-
-      const nodes = treeBeard?.children ? treeBeard.children : []
-
       return {
-        nodes,
+        nodes: tree.map((node: GitCreateTreeResponseTreeItem) => {
+          return {
+            ...node,
+            type: node.type === 'blob' ? Node_Type.File : Node_Type.Folder,
+          }
+        }),
       }
     } catch (error) {
       // Repo has been setup but no changes have been made to it
@@ -138,6 +146,6 @@ export class FileManager extends Github {
       repo: this.repo,
       sha: file.sha,
     })
-    return { ...file, repo: this.repo }
+    return file
   }
 }

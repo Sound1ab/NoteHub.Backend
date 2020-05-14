@@ -1,8 +1,4 @@
-import {
-  ModelRepoConnection,
-  MutationUpdateRepoArgs,
-  Repo,
-} from '../resolvers-types'
+import { MutationUpdateRepoArgs, Repo } from '../resolvers-types'
 
 import { IContext } from '../server'
 

@@ -25,8 +25,8 @@ export type File = {
   content?: Maybe<Scalars['String']>
   excerpt?: Maybe<Scalars['String']>
   sha: Scalars['String']
-  _links: Links
-  repo: Scalars['String']
+  type: Node_Type
+  url: Scalars['String']
 }
 
 export type GithubUser = {
@@ -36,6 +36,14 @@ export type GithubUser = {
   avatar_url: Scalars['String']
   html_url: Scalars['String']
   name: Scalars['String']
+}
+
+export type GitNode = {
+  __typename?: 'GitNode'
+  path: Scalars['String']
+  type: Node_Type
+  sha: Scalars['String']
+  url: Scalars['String']
 }
 
 export type Links = {
@@ -50,7 +58,7 @@ export type ModelFileConnection = {
 
 export type ModelNodeConnection = {
   __typename?: 'ModelNodeConnection'
-  nodes: Array<Node>
+  nodes: Array<GitNode>
 }
 
 export type ModelRepoConnection = {
@@ -99,13 +107,9 @@ export type MutationUpdateRepoArgs = {
   input: UpdateRepoInput
 }
 
-export type Node = {
-  __typename?: 'Node'
-  name: Scalars['String']
-  toggled: Scalars['Boolean']
-  type: Scalars['String']
-  path: Scalars['String']
-  children?: Maybe<Array<Node>>
+export enum Node_Type {
+  File = 'FILE',
+  Folder = 'FOLDER',
 }
 
 export type Query = {
@@ -114,9 +118,8 @@ export type Query = {
   logout: Scalars['String']
   refresh?: Maybe<Scalars['String']>
   readFile?: Maybe<File>
-  readTree: ModelNodeConnection
+  readNodes: ModelNodeConnection
   readImage?: Maybe<File>
-  listImages: ModelFileConnection
   readRepo?: Maybe<Repo>
   readGithubUserAccessToken: Scalars['String']
   readGithubUser?: Maybe<GithubUser>
@@ -231,19 +234,20 @@ export type ResolversTypes = {
   Query: Query
   String: Scalars['String']
   File: File
-  Links: Links
+  NODE_TYPE: Node_Type
   ModelNodeConnection: ModelNodeConnection
-  Node: Node
-  Boolean: Scalars['Boolean']
-  ModelFileConnection: ModelFileConnection
+  GitNode: GitNode
   Repo: Repo
   Int: Scalars['Int']
+  Boolean: Scalars['Boolean']
   GithubUser: GithubUser
   Mutation: Mutation
   CreateFileInput: CreateFileInput
   UpdateFileInput: UpdateFileInput
   DeleteFileInput: DeleteFileInput
   UpdateRepoInput: UpdateRepoInput
+  Links: Links
+  ModelFileConnection: ModelFileConnection
   ModelRepoConnection: ModelRepoConnection
 }
 
@@ -256,8 +260,8 @@ export type FileResolvers<
   content?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>
   excerpt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>
   sha?: Resolver<ResolversTypes['String'], ParentType, Context>
-  _links?: Resolver<ResolversTypes['Links'], ParentType, Context>
-  repo?: Resolver<ResolversTypes['String'], ParentType, Context>
+  type?: Resolver<ResolversTypes['NODE_TYPE'], ParentType, Context>
+  url?: Resolver<ResolversTypes['String'], ParentType, Context>
 }
 
 export type GithubUserResolvers<
@@ -269,6 +273,16 @@ export type GithubUserResolvers<
   avatar_url?: Resolver<ResolversTypes['String'], ParentType, Context>
   html_url?: Resolver<ResolversTypes['String'], ParentType, Context>
   name?: Resolver<ResolversTypes['String'], ParentType, Context>
+}
+
+export type GitNodeResolvers<
+  Context = any,
+  ParentType = ResolversTypes['GitNode']
+> = {
+  path?: Resolver<ResolversTypes['String'], ParentType, Context>
+  type?: Resolver<ResolversTypes['NODE_TYPE'], ParentType, Context>
+  sha?: Resolver<ResolversTypes['String'], ParentType, Context>
+  url?: Resolver<ResolversTypes['String'], ParentType, Context>
 }
 
 export type LinksResolvers<
@@ -289,7 +303,7 @@ export type ModelNodeConnectionResolvers<
   Context = any,
   ParentType = ResolversTypes['ModelNodeConnection']
 > = {
-  nodes?: Resolver<Array<ResolversTypes['Node']>, ParentType, Context>
+  nodes?: Resolver<Array<ResolversTypes['GitNode']>, ParentType, Context>
 }
 
 export type ModelRepoConnectionResolvers<
@@ -349,17 +363,6 @@ export type MutationResolvers<
   deleteRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>
 }
 
-export type NodeResolvers<
-  Context = any,
-  ParentType = ResolversTypes['Node']
-> = {
-  name?: Resolver<ResolversTypes['String'], ParentType, Context>
-  toggled?: Resolver<ResolversTypes['Boolean'], ParentType, Context>
-  type?: Resolver<ResolversTypes['String'], ParentType, Context>
-  path?: Resolver<ResolversTypes['String'], ParentType, Context>
-  children?: Resolver<Maybe<Array<ResolversTypes['Node']>>, ParentType, Context>
-}
-
 export type QueryResolvers<
   Context = any,
   ParentType = ResolversTypes['Query']
@@ -373,7 +376,7 @@ export type QueryResolvers<
     Context,
     QueryReadFileArgs
   >
-  readTree?: Resolver<
+  readNodes?: Resolver<
     ResolversTypes['ModelNodeConnection'],
     ParentType,
     Context
@@ -383,11 +386,6 @@ export type QueryResolvers<
     ParentType,
     Context,
     QueryReadImageArgs
-  >
-  listImages?: Resolver<
-    ResolversTypes['ModelFileConnection'],
-    ParentType,
-    Context
   >
   readRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>
   readGithubUserAccessToken?: Resolver<
@@ -418,12 +416,12 @@ export type RepoResolvers<
 export type Resolvers<Context = any> = {
   File?: FileResolvers<Context>
   GithubUser?: GithubUserResolvers<Context>
+  GitNode?: GitNodeResolvers<Context>
   Links?: LinksResolvers<Context>
   ModelFileConnection?: ModelFileConnectionResolvers<Context>
   ModelNodeConnection?: ModelNodeConnectionResolvers<Context>
   ModelRepoConnection?: ModelRepoConnectionResolvers<Context>
   Mutation?: MutationResolvers<Context>
-  Node?: NodeResolvers<Context>
   Query?: QueryResolvers<Context>
   Repo?: RepoResolvers<Context>
 }

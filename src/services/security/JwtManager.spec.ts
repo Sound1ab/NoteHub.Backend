@@ -8,6 +8,12 @@ describe('JwtManager', () => {
     jest.resetAllMocks()
   })
 
+  const customProps = {
+    avatar_url: 'MOCK_AVATAR',
+    html_url: 'MOCK_HTML_URL',
+    login: 'MOCK_LOGIN',
+  }
+
   it('should construct itself if called with new', async () => {
     const jwtManager = new JwtManager()
     const test = jwtManager instanceof JwtManager
@@ -20,7 +26,7 @@ describe('JwtManager', () => {
       const encryptedAccessToken = 'MOCK_ACCESS_TOKEN'
       const iv = 'MOCK_IV'
       const jwt = jwtManager
-        .createJwtWithToken(encryptedAccessToken, iv)
+        .createJwtWithToken(encryptedAccessToken, iv, customProps)
         .compact()
 
       const {
@@ -35,7 +41,11 @@ describe('JwtManager', () => {
       const encryptedAccessToken = 'MOCK_ACCESS_TOKEN'
       const iv = 'MOCK_IV'
 
-      const jwt = jwtManager.createJwtWithToken(encryptedAccessToken, iv)
+      const jwt = jwtManager.createJwtWithToken(
+        encryptedAccessToken,
+        iv,
+        customProps
+      )
 
       jwt.setExpiration(new Date().getTime() - 60 * 60 * 1000)
 
@@ -49,7 +59,11 @@ describe('JwtManager', () => {
       const encryptedAccessToken = 'MOCK_ACCESS_TOKEN'
       const iv = 'MOCK_IV'
 
-      const jwt = jwtManager.createJwtWithToken(encryptedAccessToken, iv)
+      const jwt = jwtManager.createJwtWithToken(
+        encryptedAccessToken,
+        iv,
+        customProps
+      )
 
       const base64EncodedJwt = jwt.compact()
 

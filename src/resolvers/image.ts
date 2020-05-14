@@ -1,6 +1,5 @@
 import {
   File,
-  ModelFileConnection,
   MutationCreateImageArgs,
   MutationDeleteImageArgs,
   MutationUpdateImageArgs,
@@ -16,16 +15,6 @@ export const ImageQueries = {
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
     return fileManager.readFile(path)
-  },
-  async listImages(
-    _: any,
-    _1: any,
-    { dataSources: { fileManager } }: IContext
-  ): Promise<ModelFileConnection> {
-    const files = await fileManager.listFiles()
-    return {
-      items: files,
-    }
   },
 }
 
