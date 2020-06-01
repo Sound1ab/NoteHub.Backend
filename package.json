@@ -43,7 +43,7 @@
     "typescript": "^3.7.4"
   },
   "dependencies": {
-    "@octokit/plugin-throttling": "^2.4.0",
+    "@octokit/plugin-throttling": "^3.2.1",
     "@octokit/rest": "^16.25.1",
     "apollo-server-lambda": "^2.9.16",
     "aws-sdk": "^2.606.0",
