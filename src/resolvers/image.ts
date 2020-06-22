@@ -24,7 +24,7 @@ export const ImageMutations = {
     { input: { path, content } }: MutationCreateImageArgs,
     { dataSources: { fileManager } }: IContext
   ): Promise<File> {
-    return fileManager.createFile(path, content)
+    return fileManager.createFile(path, content, true)
   },
   async updateImage(
     _: any,

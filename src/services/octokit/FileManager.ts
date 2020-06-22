@@ -88,7 +88,8 @@ export class FileManager extends Github {
 
   public async createFile(
     path: string,
-    content?: string | null
+    content?: string | null,
+    isImage: boolean = false
   ): Promise<File> {
     try {
       const file = await this.readFile(path)
@@ -108,7 +109,7 @@ export class FileManager extends Github {
 
     try {
       await this.octokit.repos.createFile({
-        content: content ? Github.encodeToBase64(content) : '',
+        content: isImage ? Github.encodeImageToBase64(content) : Github.encodeToBase64(content),
         message: Github.formCommitMessage(path, 'create'),
         owner: this.owner,
         path,

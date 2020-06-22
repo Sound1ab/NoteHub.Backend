@@ -12,11 +12,22 @@ const octokitWithThrottle = Octokit.plugin(Throttle)
 const jwtManager = new JwtManager()
 
 export class Github {
-  public static encodeToBase64(str: string) {
+  public static encodeToBase64(str?: string | null) {
+    if (!str) {
+      return ''
+    }
     return Buffer.from(str).toString('base64')
   }
 
+  public static encodeImageToBase64(str?: string | null) {
+    if (!str) {
+      return ''
+    }
+    return Buffer.from(str, 'binary').toString('base64')
+  }
+
   public static decodeFromBase64(str: string) {
+    // return Buffer.from(str, 'base64').toString('ascii')
     return Buffer.from(str, 'base64').toString()
   }
 
