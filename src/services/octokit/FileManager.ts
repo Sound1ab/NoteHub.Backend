@@ -60,12 +60,16 @@ export class FileManager extends Github {
       })
 
       return {
-        nodes: tree.map((node: GitCreateTreeResponseTreeItem) => {
-          return {
-            ...node,
-            type: node.type === 'blob' ? Node_Type.File : Node_Type.Folder,
-          }
-        }),
+        nodes: tree
+          .filter((node: GitCreateTreeResponseTreeItem) => {
+            return !node.path.includes('/images/')
+          })
+          .map((node: GitCreateTreeResponseTreeItem) => {
+            return {
+              ...node,
+              type: node.type === 'blob' ? Node_Type.File : Node_Type.Folder,
+            }
+          }),
       }
     } catch (error) {
       // Repo has been setup but no changes have been made to it
@@ -109,7 +113,9 @@ export class FileManager extends Github {
 
     try {
       await this.octokit.repos.createFile({
-        content: isImage ? Github.encodeImageToBase64(content) : Github.encodeToBase64(content),
+        content: isImage
+          ? Github.encodeImageToBase64(content)
+          : Github.encodeToBase64(content),
         message: Github.formCommitMessage(path, 'create'),
         owner: this.owner,
         path,
