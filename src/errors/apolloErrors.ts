@@ -1,4 +1,5 @@
 import { GraphQLError } from 'graphql'
+import { APOLLO_ERRORS } from './extensionCodes'
 
 // This Class has been copied from apollo-server-errors to remove
 // transpiling issues in ts-jest
@@ -41,7 +42,7 @@ export class ApolloError extends Error implements GraphQLError {
 
 export class JwtExpiredError extends ApolloError {
   constructor() {
-    super('JWT has expired', 'JWT_EXPIRED')
+    super('JWT has expired', APOLLO_ERRORS.JWT_EXPIRED)
 
     Object.defineProperty(this, 'name', { value: 'JwtExpired' })
   }
@@ -49,7 +50,7 @@ export class JwtExpiredError extends ApolloError {
 
 export class JwtSignatureMismatchError extends ApolloError {
   constructor() {
-    super('JWT signature mismatch', 'JWT_SIGNATURE_MISMATCH')
+    super('JWT signature mismatch', APOLLO_ERRORS.JWT_SIGNATURE_MISMATCH)
 
     Object.defineProperty(this, 'name', { value: 'JwtSignatureMismatch' })
   }
@@ -57,7 +58,7 @@ export class JwtSignatureMismatchError extends ApolloError {
 
 export class RefreshTokenExpiredError extends ApolloError {
   constructor() {
-    super('Refresh Token has expired', 'REFRESH_TOKEN_EXPIRED')
+    super('Refresh Token has expired', APOLLO_ERRORS.REFRESH_TOKEN_EXPIRED)
 
     Object.defineProperty(this, 'name', { value: 'RefreshTokenExpired' })
   }
@@ -65,7 +66,7 @@ export class RefreshTokenExpiredError extends ApolloError {
 
 export class RefreshTokenNotValidError extends ApolloError {
   constructor() {
-    super('Refresh Token is not valid', 'REFRESH_TOKEN_NOT_VALID')
+    super('Refresh Token is not valid', APOLLO_ERRORS.REFRESH_TOKEN_NOT_VALID)
 
     Object.defineProperty(this, 'name', { value: 'RefreshTokenNotValid' })
   }

@@ -66,6 +66,8 @@ export function configureServer() {
       event: APIGatewayProxyEvent
       context: Context
     }) => {
+      const jwtManager = new JwtManager()
+
       const bearerToken = event.headers?.Authorization ?? ''
       const cookie = event.headers?.Cookie ?? null
       const owner = (event.headers?.Owner || event.headers?.owner) ?? null
@@ -76,6 +78,14 @@ export function configureServer() {
         jwt = bearerToken.substring(7, bearerToken.length)
       }
 
+      // Verify the JWT here first so that we can throw a graphQLError
+      // If we throw when extracting the access token we will be outside
+      // the resolver and therefore it will only throw a network error
+      // and the client refresh will not work
+      if (jwt) {
+        jwtManager.getJwtValues(jwt)
+      }
+
       return {
         context,
         cookie,
@@ -84,6 +94,7 @@ export function configureServer() {
       }
     },
     dataSources: () => {
+      console.log('here 2')
       return {
         fileManager: new FileManager(),
         jwtManager: new JwtManager(),
