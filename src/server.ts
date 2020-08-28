@@ -5,30 +5,12 @@ import { ImageMutations, ImageQueries } from './resolvers/image'
 import { RepoMutations, RepoQueries } from './resolvers/repo'
 
 import { ApolloServer } from 'apollo-server-lambda'
-import { ApolloServerPlugin } from 'apollo-server-plugin-base'
 import { AuthenticationError } from 'apollo-server-lambda'
 import { AuthorizationQueries } from './resolvers/authorization'
 import { GraphQLFormattedError } from 'graphql'
 import { UserQueries } from './resolvers/user'
+import { addHeadersFromContext } from './utils'
 import { generateTypedefs } from './schema'
-
-const customHeadersPlugin: ApolloServerPlugin = {
-  requestDidStart() {
-    return {
-      willSendResponse(requestContext: any) {
-        const {
-          context: { addHeaders = [] },
-        } = requestContext.context
-
-        addHeaders.forEach(({ key, value }: any) => {
-          requestContext.response.http.headers.append(key, value)
-        })
-
-        return requestContext
-      },
-    }
-  },
-}
 
 export interface IContext {
   context: Record<string, any>
@@ -66,40 +48,19 @@ export function configureServer() {
       event: APIGatewayProxyEvent
       context: Context
     }) => {
-      const jwtManager = new JwtManager()
-
-      const bearerToken = event.headers?.Authorization ?? ''
+      const bearerToken = event.headers?.Authorization
       const cookie = event.headers?.Cookie ?? null
       const owner = (event.headers?.Owner || event.headers?.owner) ?? null
-
-      let jwt: string | null = null
-
-      if (bearerToken.startsWith('Bearer ')) {
-        jwt = bearerToken.substring(7, bearerToken.length)
-      }
-
-      // Verify the JWT here first so that we can throw a graphQLError
-      // If we throw when extracting the access token we will be outside
-      // the resolver and therefore it will only throw a network error
-      // and the client refresh will not work
-      if (jwt) {
-        jwtManager.getJwtValues(jwt)
-      }
+      const jwt =
+        bearerToken && typeof bearerToken === 'string'
+          ? bearerToken.substring(7, bearerToken.length)
+          : null
 
       return {
         context,
         cookie,
         jwt,
         owner,
-      }
-    },
-    dataSources: () => {
-      console.log('here 2')
-      return {
-        fileManager: new FileManager(),
-        jwtManager: new JwtManager(),
-        repoManager: new RepoManager(),
-        userManager: new UserManager(),
       }
     },
     formatError: (error: Error): GraphQLFormattedError => {
@@ -113,7 +74,7 @@ export function configureServer() {
 
       return formattedError as GraphQLFormattedError
     },
-    plugins: [customHeadersPlugin],
+    plugins: [addHeadersFromContext],
     resolvers,
     typeDefs: generateTypedefs(),
   })

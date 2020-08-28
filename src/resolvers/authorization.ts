@@ -1,3 +1,4 @@
+import { JwtManager, UserManager } from '../services'
 import {
   addCookie,
   decrypt,
@@ -8,15 +9,19 @@ import {
 import { AuthenticationError } from 'apollo-server-lambda'
 import { IContext } from '../server'
 
+const jwtManager = new JwtManager()
+
 export const AuthorizationQueries = {
   async login(
     _0: any,
     _1: any,
-    { cookie, dataSources: { jwtManager, userManager } }: IContext
+    { cookie, ...rest }: IContext
   ): Promise<string> {
     if (!cookie) {
       throw new AuthenticationError('No cookie sent')
     }
+
+    const userManager = new UserManager(rest)
 
     const refreshToken = parseRefreshTokenFromCookie(cookie)
 
@@ -37,11 +42,13 @@ export const AuthorizationQueries = {
   async refresh(
     _0: any,
     _1: any,
-    { context, cookie, dataSources: { jwtManager, userManager } }: IContext
+    { context, cookie, ...rest }: IContext
   ): Promise<string> {
     if (!cookie) {
       throw new AuthenticationError('No cookie sent')
     }
+
+    const userManager = new UserManager(rest)
 
     const refreshToken = parseRefreshTokenFromCookie(cookie)
 
@@ -73,11 +80,7 @@ export const AuthorizationQueries = {
 
     return regeneratedJwt
   },
-  async logout(
-    _0: any,
-    _1: any,
-    { context, cookie, dataSources: { jwtManager } }: IContext
-  ) {
+  async logout(_0: any, _1: any, { context, cookie }: IContext) {
     if (!cookie) {
       throw new AuthenticationError('No cookie sent')
     }

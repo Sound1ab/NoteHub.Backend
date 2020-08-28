@@ -2,16 +2,21 @@ import {
   GithubUser,
   QueryReadGithubUserAccessTokenArgs,
 } from '../resolvers-types'
+import { JwtManager, UserManager } from '../services'
 import { addCookie, encrypt } from '../utils'
 
 import { IContext } from '../server'
+
+const jwtManager = new JwtManager()
 
 export const UserQueries = {
   async readGithubUserAccessToken(
     _: any,
     { code, state }: QueryReadGithubUserAccessTokenArgs,
-    { context, dataSources: { userManager, jwtManager } }: IContext
+    { context, ...rest }: IContext
   ): Promise<string> {
+    const userManager = new UserManager(rest)
+
     const accessToken = await userManager.readGithubUserAccessToken(code, state)
 
     const owner = await userManager
@@ -30,11 +35,9 @@ export const UserQueries = {
 
     return jwt
   },
-  readGithubUser(
-    _0: any,
-    _1: any,
-    { dataSources: { userManager } }: IContext
-  ): Promise<GithubUser> {
+  readGithubUser(_0: any, _1: any, context: IContext): Promise<GithubUser> {
+    const userManager = new UserManager(context)
+
     return userManager.readUser()
   },
 }

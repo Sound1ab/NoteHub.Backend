@@ -44,10 +44,7 @@ export class Github {
   public owner: string
   private userAgent = 'noted-api-v1'
 
-  // Config is passed by Apollo when added as a DataSource in Apollo Server
-  public initialize({
-    context: { jwt, owner },
-  }: DataSourceConfig<IContext>): void {
+  constructor({ jwt, owner }: Pick<IContext, 'jwt' | 'owner'>) {
     const accessToken = this.getAccessToken(jwt)
 
     this.octokit = this.initOctokit(accessToken)
