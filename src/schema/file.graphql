@@ -8,6 +8,7 @@ extend type Mutation {
   createFile(input: CreateFileInput!): File
   updateFile(input: UpdateFileInput!): File
   deleteFile(input: DeleteFileInput!): File
+  moveFile(input: MoveFileInput!): File
 }
 
 ## Types
@@ -50,6 +51,11 @@ input CreateFileInput {
 input UpdateFileInput {
   path: String!
   content: String
+}
+
+input MoveFileInput {
+  path: String!
+  newPath: String!
 }
 
 input DeleteFileInput {

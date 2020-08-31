@@ -3,6 +3,7 @@ import {
   ModelNodeConnection,
   MutationCreateFileArgs,
   MutationDeleteFileArgs,
+  MutationMoveFileArgs,
   MutationUpdateFileArgs,
   QueryReadFileArgs,
 } from '../resolvers-types'
@@ -58,5 +59,14 @@ export const FileMutations = {
     const fileManager = new FileManager(context)
 
     return fileManager.deleteFile(path)
+  },
+  async moveFile(
+    _: any,
+    { input }: MutationMoveFileArgs,
+    context: IContext
+  ): Promise<File> {
+    const fileManager = new FileManager(context)
+
+    return fileManager.moveFile(input)
   },
 }

@@ -66,11 +66,17 @@ export type ModelRepoConnection = {
   items: Array<Repo>
 }
 
+export type MoveFileInput = {
+  path: Scalars['String']
+  newPath: Scalars['String']
+}
+
 export type Mutation = {
   __typename?: 'Mutation'
   createFile?: Maybe<File>
   updateFile?: Maybe<File>
   deleteFile?: Maybe<File>
+  moveFile?: Maybe<File>
   createImage?: Maybe<File>
   updateImage?: Maybe<File>
   deleteImage?: Maybe<File>
@@ -89,6 +95,10 @@ export type MutationUpdateFileArgs = {
 
 export type MutationDeleteFileArgs = {
   input: DeleteFileInput
+}
+
+export type MutationMoveFileArgs = {
+  input: MoveFileInput
 }
 
 export type MutationCreateImageArgs = {
@@ -245,6 +255,7 @@ export type ResolversTypes = {
   CreateFileInput: CreateFileInput
   UpdateFileInput: UpdateFileInput
   DeleteFileInput: DeleteFileInput
+  MoveFileInput: MoveFileInput
   UpdateRepoInput: UpdateRepoInput
   Links: Links
   ModelFileConnection: ModelFileConnection
@@ -334,6 +345,12 @@ export type MutationResolvers<
     ParentType,
     Context,
     MutationDeleteFileArgs
+  >
+  moveFile?: Resolver<
+    Maybe<ResolversTypes['File']>,
+    ParentType,
+    Context,
+    MutationMoveFileArgs
   >
   createImage?: Resolver<
     Maybe<ResolversTypes['File']>,

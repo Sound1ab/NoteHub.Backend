@@ -1,6 +1,7 @@
 import {
   File,
   ModelNodeConnection,
+  MoveFileInput,
   Node_Type,
   UpdateFileInput,
 } from '../../resolvers-types'
@@ -154,5 +155,13 @@ export class FileManager extends Github {
       sha: file.sha,
     })
     return file
+  }
+
+  public async moveFile({ path, newPath }: MoveFileInput): Promise<File> {
+    const { content } = await this.readFile(path)
+
+    await this.deleteFile(path)
+
+    return this.createFile(newPath, content)
   }
 }
