@@ -62,7 +62,7 @@ export class FileManager extends Github {
       return {
         nodes: tree
           .filter((node: GitCreateTreeResponseTreeItem) => {
-            return !node.path.includes('/images/')
+            return !node.path.includes('__notehub__images__')
           })
           .map((node: GitCreateTreeResponseTreeItem) => {
             return {

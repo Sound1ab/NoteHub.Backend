@@ -1,4 +1,3 @@
-import { DataSourceConfig } from 'apollo-datasource/src/index'
 import { GraphQLClient } from 'graphql-request'
 import { IContext } from '../../server'
 import { JwtManager } from '..'
