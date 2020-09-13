@@ -1,5 +1,4 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda'
-import { FileManager, JwtManager, RepoManager, UserManager } from './services'
 import { FileMutations, FileQueries } from './resolvers/file'
 import { ImageMutations, ImageQueries } from './resolvers/image'
 import { RepoMutations, RepoQueries } from './resolvers/repo'
@@ -16,13 +15,6 @@ export interface IContext {
   context: Record<string, any>
   jwt: string | null
   cookie: string | null
-  owner: string | null
-  dataSources: {
-    fileManager: FileManager
-    jwtManager: JwtManager
-    repoManager: RepoManager
-    userManager: UserManager
-  }
 }
 
 export function configureServer() {
@@ -49,8 +41,9 @@ export function configureServer() {
       context: Context
     }) => {
       const bearerToken = event.headers?.Authorization
+
       const cookie = event.headers?.Cookie ?? null
-      const owner = (event.headers?.Owner || event.headers?.owner) ?? null
+
       const jwt =
         bearerToken && typeof bearerToken === 'string'
           ? bearerToken.substring(7, bearerToken.length)
@@ -60,7 +53,6 @@ export function configureServer() {
         context,
         cookie,
         jwt,
-        owner,
       }
     },
     formatError: (error: Error): GraphQLFormattedError => {

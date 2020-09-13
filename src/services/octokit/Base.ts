@@ -43,13 +43,13 @@ export class Github {
   public owner: string
   private userAgent = 'noted-api-v1'
 
-  constructor({ jwt, owner }: Pick<IContext, 'jwt' | 'owner'>) {
-    const accessToken = this.getAccessToken(jwt)
+  constructor({ jwt }: Pick<IContext, 'jwt'>) {
+    const { accessToken, owner } = this.verifyJwtAndGetUserDetails(jwt)
 
     this.octokit = this.initOctokit(accessToken)
     this.graphql = this.initGraphQL(accessToken)
 
-    this.owner = owner ?? ''
+    this.owner = owner
   }
 
   public initOctokitWithAccessToken(accessToken: string): this {
@@ -93,15 +93,18 @@ export class Github {
     })
   }
 
-  private getAccessToken(jwt: string | null) {
+  private verifyJwtAndGetUserDetails(jwt: string | null) {
     if (!jwt) {
-      return ''
+      return {
+        accessToken: '',
+        owner: '',
+      }
     }
 
     const {
-      body: { accessToken: encryptedAccessToken, iv },
+      body: { accessToken: encryptedAccessToken, iv, login },
     } = jwtManager.getJwtValues(jwt)
 
-    return decrypt(encryptedAccessToken, iv)
+    return { accessToken: decrypt(encryptedAccessToken, iv), owner: login }
   }
 }

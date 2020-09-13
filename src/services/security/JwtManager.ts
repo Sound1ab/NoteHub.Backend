@@ -29,11 +29,6 @@ export class JwtManager {
     this.dynamoManager = new DynamoManager(tableName)
   }
 
-  // Needed to confirm to Apollo Datasource interface
-  public initialize(): void {
-    return
-  }
-
   public createJwtWithToken(
     encryptedAccessToken: string,
     iv: string,
@@ -49,7 +44,7 @@ export class JwtManager {
       accessToken: encryptedAccessToken,
       avatar_url,
       html_url,
-      iss: 'http://notehub.com/',
+      iss: 'http://notehub.xyz/',
       iv,
       login,
     }
