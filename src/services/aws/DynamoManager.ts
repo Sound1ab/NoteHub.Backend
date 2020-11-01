@@ -3,10 +3,10 @@ import { DynamoDB } from 'aws-sdk'
 const options =
   process.env.NODE_ENV === 'none'
     ? {
-        accessKeyId: 'DEFAULT_ACCESS_KEY',
+        accessKeyId: 'S3RVER',
         endpoint: 'http://localhost:8000',
         region: 'localhost',
-        secretAccessKey: 'DEFAULT_SECRET',
+        secretAccessKey: 'S3RVER',
       }
     : {}
 

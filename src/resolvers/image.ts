@@ -5,8 +5,8 @@ import {
   MutationUpdateImageArgs,
   QueryReadImageArgs,
 } from '../resolvers-types'
+import { FileManager, S3Manager } from '../services'
 
-import { FileManager } from '../services'
 import { IContext } from '../server'
 
 export const ImageQueries = {
@@ -46,7 +46,18 @@ export const ImageMutations = {
     context: IContext
   ): Promise<File> {
     const fileManager = new FileManager(context)
-    
+
     return fileManager.deleteFile(path)
+  },
+  async createSignedUrl(): Promise<string> {
+    const bucket = process.env.S3_IMAGE_BUCKET
+
+    if (!bucket) {
+      throw new Error('No bucket set')
+    }
+
+    const s3Manager = new S3Manager(bucket)
+
+    return s3Manager.createSignedUrl()
   },
 }

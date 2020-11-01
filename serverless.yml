@@ -4,9 +4,9 @@ service:
 plugins:
   - serverless-dotenv-plugin
   - serverless-webpack
+  - serverless-s3-local
   - serverless-dynamodb-local
   - serverless-offline
-
 provider:
   name: aws
   runtime: nodejs10.x
@@ -14,6 +14,7 @@ provider:
   region: eu-west-1
   environment:
     DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}-refresh-tokens
+    S3_IMAGE_BUCKET: ${self:service}-${opt:stage, self:provider.stage}-images
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -23,7 +24,11 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
-      Resource: 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}'
+        - s3:PutObject
+        - s3:GetObject
+      Resource:
+        - 'arn:aws:dynamodb:${self:provider.region}:*:table/${self:provider.environment.DYNAMODB_TABLE}'
+        - 'arn:aws:s3:::${self:provider.environment.S3_IMAGE_BUCKET}/*'
 
 custom:
   webpack:
@@ -33,6 +38,11 @@ custom:
       - ${self:provider.stage}
     start:
       migrate: true
+  s3:
+    host: localhost
+    directory: /tmp
+    cors: ./s3-cors.xml
+    allowMismatchedSignatures: true
 
 functions:
   hello:
@@ -78,3 +88,19 @@ resources:
           ReadCapacityUnits: 1
           WriteCapacityUnits: 1
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
+    StorageBucket:
+      Type: "AWS::S3::Bucket"
+      Properties:
+        BucketName: ${self:provider.environment.S3_IMAGE_BUCKET}
+        CorsConfiguration:
+          CorsRules:
+            - AllowedOrigins:
+                - 'http://localhost:8080'
+                - 'http://noted-development.s3-website-eu-west-1.amazonaws.com'
+                - 'https://notehub.xyz'
+                - 'https://www.notehub.xyz'
+              AllowedHeaders:
+                - '*'
+              AllowedMethods:
+                - PUT
+              MaxAge: 3000
