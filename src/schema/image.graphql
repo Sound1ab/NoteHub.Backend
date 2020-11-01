@@ -7,4 +7,5 @@ extend type Mutation {
   createImage(input: CreateFileInput!): File
   updateImage(input: UpdateFileInput!): File
   deleteImage(input: DeleteFileInput!): File
+  createSignedUrl: String
 }
