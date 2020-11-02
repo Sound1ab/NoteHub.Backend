@@ -4,13 +4,19 @@ import { v4 as uuidv4 } from 'uuid'
 const options =
   process.env.NODE_ENV === 'none'
     ? {
-        accessKeyId: 'S3RVER', // This specific key is required when working offline
+        accessKeyId: process.env.SERVERLESS_APP_ACCESS_KEY_ID!,
         endpoint: 'http://localhost:4569',
         region: 'localhost',
         s3ForcePathStyle: true,
-        secretAccessKey: 'S3RVER',
+        secretAccessKey: process.env.SERVERLESS_APP_SECRET_ACCESS_KEY!,
       }
-    : {}
+    : {
+        accessKeyId: process.env.SERVERLESS_APP_ACCESS_KEY_ID!,
+        s3ForcePathStyle: true,
+        secretAccessKey: process.env.SERVERLESS_APP_SECRET_ACCESS_KEY!,
+      }
+
+console.log('options', options)
 
 const s3 = new S3(options)
 
