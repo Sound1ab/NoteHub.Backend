@@ -12,8 +12,8 @@ const options =
       }
     : {
         accessKeyId: process.env.SERVERLESS_APP_ACCESS_KEY_ID!,
-        s3ForcePathStyle: true,
         secretAccessKey: process.env.SERVERLESS_APP_SECRET_ACCESS_KEY!,
+        signatureVersion: 'v4',
       }
 
 console.log('options', options)
@@ -29,7 +29,9 @@ export class S3Manager {
 
   public async createSignedUrl() {
     const params = {
+      ACL: 'public-read',
       Bucket: this.Bucket,
+      ContentType: 'image/jpeg',
       Key: uuidv4(),
     }
 
