@@ -31,7 +31,6 @@ export class S3Manager {
     const params = {
       ACL: 'public-read',
       Bucket: this.Bucket,
-      ContentType: 'image/jpeg',
       Key: uuidv4(),
     }
 
