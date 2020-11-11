@@ -1,5 +1,6 @@
 import {
   File,
+  Message,
   ModelNodeConnection,
   MoveFileInput,
   Node_Type,
@@ -9,6 +10,7 @@ import {
 import { GetCommit } from '../../queries/GetCommit'
 import { GitCreateTreeResponseTreeItem } from '@octokit/rest'
 import { Github } from './Base'
+import { VFileCompatible } from 'vfile'
 
 export class FileManager extends Github {
   public async readFile(path: string): Promise<File> {
@@ -20,11 +22,23 @@ export class FileManager extends Github {
 
     if (data.type === 'file') {
       const content = Github.decodeFromBase64(data.content)
+
+      let messages: VFileCompatible[] = []
+
+      if (this.retext) {
+        const markdownTree = this.retext.createMarkdownTree(content)
+
+        messages = await this.retext.processMarkdownTree(markdownTree)
+      }
+
       return {
         ...data,
         content,
         excerpt: `${content.substring(0, 50)}...`,
         filename: data.name,
+        messages: {
+          nodes: messages,
+        },
         type: Node_Type.File,
       }
     }

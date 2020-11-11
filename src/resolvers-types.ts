@@ -27,6 +27,7 @@ export type File = {
   sha: Scalars['String'],
   type: Node_Type,
   url: Scalars['String'],
+  messages: ModelMessageConnection,
 };
 
 export type GithubUser = {
@@ -51,9 +52,33 @@ export type Links = {
   html: Scalars['String'],
 };
 
+export type Location = {
+   __typename?: 'Location',
+  start?: Maybe<Point>,
+  end?: Maybe<Point>,
+};
+
+export type Message = {
+   __typename?: 'Message',
+  message?: Maybe<Scalars['String']>,
+  name?: Maybe<Scalars['String']>,
+  reason?: Maybe<Scalars['String']>,
+  line?: Maybe<Scalars['Int']>,
+  column?: Maybe<Scalars['Int']>,
+  location?: Maybe<Location>,
+  source?: Maybe<Scalars['String']>,
+  ruleId?: Maybe<Scalars['String']>,
+  fatal?: Maybe<Scalars['Boolean']>,
+};
+
 export type ModelFileConnection = {
    __typename?: 'ModelFileConnection',
   items: Array<File>,
+};
+
+export type ModelMessageConnection = {
+   __typename?: 'ModelMessageConnection',
+  nodes: Array<Message>,
 };
 
 export type ModelNodeConnection = {
@@ -130,6 +155,13 @@ export enum Node_Type {
   File = 'FILE',
   Folder = 'FOLDER'
 }
+
+export type Point = {
+   __typename?: 'Point',
+  line?: Maybe<Scalars['Int']>,
+  column?: Maybe<Scalars['Int']>,
+  offset?: Maybe<Scalars['Int']>,
+};
 
 export type Query = {
    __typename?: 'Query',
@@ -248,11 +280,15 @@ export type ResolversTypes = {
   String: Scalars['String'],
   File: File,
   NODE_TYPE: Node_Type,
+  ModelMessageConnection: ModelMessageConnection,
+  Message: Message,
+  Int: Scalars['Int'],
+  Location: Location,
+  Point: Point,
+  Boolean: Scalars['Boolean'],
   ModelNodeConnection: ModelNodeConnection,
   GitNode: GitNode,
   Repo: Repo,
-  Int: Scalars['Int'],
-  Boolean: Scalars['Boolean'],
   GithubUser: GithubUser,
   Mutation: Mutation,
   CreateFileInput: CreateFileInput,
@@ -273,6 +309,7 @@ export type FileResolvers<Context = any, ParentType = ResolversTypes['File']> = 
   sha?: Resolver<ResolversTypes['String'], ParentType, Context>,
   type?: Resolver<ResolversTypes['NODE_TYPE'], ParentType, Context>,
   url?: Resolver<ResolversTypes['String'], ParentType, Context>,
+  messages?: Resolver<ResolversTypes['ModelMessageConnection'], ParentType, Context>,
 };
 
 export type GithubUserResolvers<Context = any, ParentType = ResolversTypes['GithubUser']> = {
@@ -294,8 +331,29 @@ export type LinksResolvers<Context = any, ParentType = ResolversTypes['Links']> 
   html?: Resolver<ResolversTypes['String'], ParentType, Context>,
 };
 
+export type LocationResolvers<Context = any, ParentType = ResolversTypes['Location']> = {
+  start?: Resolver<Maybe<ResolversTypes['Point']>, ParentType, Context>,
+  end?: Resolver<Maybe<ResolversTypes['Point']>, ParentType, Context>,
+};
+
+export type MessageResolvers<Context = any, ParentType = ResolversTypes['Message']> = {
+  message?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
+  reason?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
+  line?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
+  column?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
+  location?: Resolver<Maybe<ResolversTypes['Location']>, ParentType, Context>,
+  source?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
+  ruleId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
+  fatal?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, Context>,
+};
+
 export type ModelFileConnectionResolvers<Context = any, ParentType = ResolversTypes['ModelFileConnection']> = {
   items?: Resolver<Array<ResolversTypes['File']>, ParentType, Context>,
+};
+
+export type ModelMessageConnectionResolvers<Context = any, ParentType = ResolversTypes['ModelMessageConnection']> = {
+  nodes?: Resolver<Array<ResolversTypes['Message']>, ParentType, Context>,
 };
 
 export type ModelNodeConnectionResolvers<Context = any, ParentType = ResolversTypes['ModelNodeConnection']> = {
@@ -318,6 +376,12 @@ export type MutationResolvers<Context = any, ParentType = ResolversTypes['Mutati
   createRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>,
   updateRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context, MutationUpdateRepoArgs>,
   deleteRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>,
+};
+
+export type PointResolvers<Context = any, ParentType = ResolversTypes['Point']> = {
+  line?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
+  column?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
+  offset?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
 };
 
 export type QueryResolvers<Context = any, ParentType = ResolversTypes['Query']> = {
@@ -346,10 +410,14 @@ export type Resolvers<Context = any> = {
   GithubUser?: GithubUserResolvers<Context>,
   GitNode?: GitNodeResolvers<Context>,
   Links?: LinksResolvers<Context>,
+  Location?: LocationResolvers<Context>,
+  Message?: MessageResolvers<Context>,
   ModelFileConnection?: ModelFileConnectionResolvers<Context>,
+  ModelMessageConnection?: ModelMessageConnectionResolvers<Context>,
   ModelNodeConnection?: ModelNodeConnectionResolvers<Context>,
   ModelRepoConnection?: ModelRepoConnectionResolvers<Context>,
   Mutation?: MutationResolvers<Context>,
+  Point?: PointResolvers<Context>,
   Query?: QueryResolvers<Context>,
   Repo?: RepoResolvers<Context>,
 };

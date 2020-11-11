@@ -24,6 +24,7 @@ type File {
   sha: String!
   type: NODE_TYPE!
   url: String!
+  messages: ModelMessageConnection!
 }
 
 type GitNode {
@@ -33,7 +34,34 @@ type GitNode {
   url: String!
 }
 
+type Message {
+  message: String
+  name: String
+  reason: String
+  line: Int
+  column: Int
+  location: Location
+  source: String
+  ruleId: String
+  fatal: Boolean
+}
+
+type Location {
+  start: Point
+  end: Point
+}
+
+type Point {
+  line: Int
+  column: Int
+  offset: Int
+}
+
 ## Query outputs
+type ModelMessageConnection {
+  nodes: [Message!]!
+}
+
 type ModelNodeConnection {
   nodes: [GitNode!]!
 }
