@@ -2,6 +2,8 @@ import { Node } from 'unist'
 import { VFileCompatible } from 'vfile'
 import { VFileMessage } from 'vfile-message'
 import dictionary from 'dictionary-en-gb'
+import equality from 'retext-equality'
+import indefiniteArticle from 'retext-indefinite-article'
 import latin from 'retext-latin'
 import parse from 'remark-parse'
 import repeated from 'retext-repeated-words'
@@ -33,6 +35,8 @@ export class Retext {
       .use(stringify)
       .use(spell, dictionary)
       .use(repeated)
+      .use(equality)
+      .use(indefiniteArticle)
 
     await this.visitAsync(tree, 'text', async (node: INode) => {
       const file = await process.process(node.value)
