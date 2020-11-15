@@ -10,13 +10,15 @@ import stringify from 'retext-stringify'
 import unified from 'unified'
 import visit from 'unist-util-visit'
 
+interface IVFileMessage extends VFileMessage {
+  actual?: string
+}
+
 interface INode extends Node {
   value: string
 }
 
 export class Retext {
-  public messages: VFileCompatible[] = []
-
   public createMarkdownTree(markdown: string) {
     return unified()
       .use(parse)
@@ -24,6 +26,8 @@ export class Retext {
   }
 
   public async processMarkdownTree(tree: Node) {
+    let messageCollection: VFileCompatible[] = []
+
     const process = unified()
       .use(latin)
       .use(stringify)
@@ -42,30 +46,36 @@ export class Retext {
         node
       )
 
-      this.messages = [...this.messages, ...messages]
+      messageCollection = [...messageCollection, ...messages]
     })
 
-    return this.messages
+    return messageCollection
   }
 
   private getMessagesWithINodeLineLocation(
-    messages: VFileMessage[],
+    messages: IVFileMessage[],
     node: INode
   ) {
-    return messages.map(message => ({
-      ...message,
-      location: {
-        ...message.location,
-        end: {
-          ...message?.location?.end,
-          line: node.position?.end.line,
+    return messages.map(mappedMessage => {
+      const startLetter =
+        (node.position?.start.offset ?? 0) +
+        (mappedMessage.location.start?.offset ?? 0)
+      const endLetter = startLetter + (mappedMessage.actual?.length ?? 0)
+
+      return {
+        ...mappedMessage,
+        actual: (mappedMessage as any).actual.length,
+        location: {
+          ...mappedMessage.location,
+          end: {
+            offset: endLetter,
+          },
+          start: {
+            offset: startLetter,
+          },
         },
-        start: {
-          ...message?.location?.start,
-          line: node.position?.start.line,
-        },
-      },
-    }))
+      }
+    })
   }
 
   private async visitAsync(

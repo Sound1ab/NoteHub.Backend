@@ -27,7 +27,8 @@ export type File = {
   sha: Scalars['String'],
   type: Node_Type,
   url: Scalars['String'],
-  messages: ModelMessageConnection,
+  messages?: Maybe<ModelMessageConnection>,
+  readAt?: Maybe<Scalars['String']>,
 };
 
 export type GithubUser = {
@@ -66,6 +67,7 @@ export type Message = {
   line?: Maybe<Scalars['Int']>,
   column?: Maybe<Scalars['Int']>,
   location?: Maybe<Location>,
+  actual?: Maybe<Scalars['Int']>,
   source?: Maybe<Scalars['String']>,
   ruleId?: Maybe<Scalars['String']>,
   fatal?: Maybe<Scalars['Boolean']>,
@@ -158,8 +160,6 @@ export enum Node_Type {
 
 export type Point = {
    __typename?: 'Point',
-  line?: Maybe<Scalars['Int']>,
-  column?: Maybe<Scalars['Int']>,
   offset?: Maybe<Scalars['Int']>,
 };
 
@@ -309,7 +309,8 @@ export type FileResolvers<Context = any, ParentType = ResolversTypes['File']> = 
   sha?: Resolver<ResolversTypes['String'], ParentType, Context>,
   type?: Resolver<ResolversTypes['NODE_TYPE'], ParentType, Context>,
   url?: Resolver<ResolversTypes['String'], ParentType, Context>,
-  messages?: Resolver<ResolversTypes['ModelMessageConnection'], ParentType, Context>,
+  messages?: Resolver<Maybe<ResolversTypes['ModelMessageConnection']>, ParentType, Context>,
+  readAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
 };
 
 export type GithubUserResolvers<Context = any, ParentType = ResolversTypes['GithubUser']> = {
@@ -343,6 +344,7 @@ export type MessageResolvers<Context = any, ParentType = ResolversTypes['Message
   line?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
   column?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
   location?: Resolver<Maybe<ResolversTypes['Location']>, ParentType, Context>,
+  actual?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
   source?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
   ruleId?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
   fatal?: Resolver<Maybe<ResolversTypes['Boolean']>, ParentType, Context>,
@@ -379,8 +381,6 @@ export type MutationResolvers<Context = any, ParentType = ResolversTypes['Mutati
 };
 
 export type PointResolvers<Context = any, ParentType = ResolversTypes['Point']> = {
-  line?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
-  column?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
   offset?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, Context>,
 };
 

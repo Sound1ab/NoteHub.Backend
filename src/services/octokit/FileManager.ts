@@ -39,6 +39,7 @@ export class FileManager extends Github {
         messages: {
           nodes: messages,
         },
+        readAt: Date.now().toString(),
         type: Node_Type.File,
       }
     }

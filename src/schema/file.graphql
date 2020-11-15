@@ -24,7 +24,8 @@ type File {
   sha: String!
   type: NODE_TYPE!
   url: String!
-  messages: ModelMessageConnection!
+  messages: ModelMessageConnection
+  readAt: String
 }
 
 type GitNode {
@@ -41,6 +42,7 @@ type Message {
   line: Int
   column: Int
   location: Location
+  actual: Int
   source: String
   ruleId: String
   fatal: Boolean
@@ -52,8 +54,6 @@ type Location {
 }
 
 type Point {
-  line: Int
-  column: Int
   offset: Int
 }
 
