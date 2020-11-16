@@ -53,6 +53,7 @@ functions:
           path: hello
   graphql:
     handler: src/handlers.graphql
+    timeout: 10
     events:
       - http:
           method: ANY
