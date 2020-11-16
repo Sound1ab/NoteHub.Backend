@@ -41,7 +41,7 @@ export class Retext {
     await this.visitAsync(tree, 'text', async (node: INode) => {
       const file = await process.process(node.value)
 
-      if (!file) {
+      if (!file || !file.messages || !Array.isArray(file.messages)) {
         return
       }
 
