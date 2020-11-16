@@ -64,11 +64,12 @@ export class Retext {
       const startLetter =
         (node.position?.start.offset ?? 0) +
         (mappedMessage.location.start?.offset ?? 0)
-      const endLetter = startLetter + (mappedMessage.actual?.length ?? 0)
+      const wordLength = mappedMessage.actual?.length ?? 0
+      const endLetter = startLetter + wordLength
 
       return {
         ...mappedMessage,
-        actual: (mappedMessage as any).actual.length,
+        actual: wordLength,
         location: {
           ...mappedMessage.location,
           end: {
