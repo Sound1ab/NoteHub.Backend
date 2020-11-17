@@ -25,7 +25,13 @@ export class FileManager extends Github {
       let messages: VFileCompatible[] = []
 
       if (this.retext) {
-        messages = await this.retext.processMarkdownTree(content)
+        const plugins = await this.retext.processFrontMatter(content)
+
+        if (plugins) {
+          const parser = await this.retext.addPlugin(plugins)
+
+          messages = await this.retext.processMarkdownTree(content, parser)
+        }
       }
 
       return {

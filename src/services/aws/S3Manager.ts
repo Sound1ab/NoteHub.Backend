@@ -16,8 +16,6 @@ const options =
         signatureVersion: 'v4',
       }
 
-console.log('options', options)
-
 const s3 = new S3(options)
 
 export class S3Manager {
