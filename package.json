@@ -66,8 +66,11 @@
     "njwt": "^1.0.0",
     "parse-english": "^4.2.0",
     "rand-token": "^0.4.0",
+    "remark-extract-frontmatter": "^3.0.0",
+    "remark-frontmatter": "^3.0.0",
     "remark-parse": "^9.0.0",
     "remark-retext": "^4.0.0",
+    "remark-stringify": "^9.0.0",
     "retext-equality": "^5.5.0",
     "retext-indefinite-article": "^2.0.1",
     "retext-latin": "^2.0.4",
@@ -81,7 +84,8 @@
     "unist-util-visit": "^2.0.3",
     "uuid": "^8.3.1",
     "webpack": "^4.29.6",
-    "webpack-node-externals": "^1.7.2"
+    "webpack-node-externals": "^1.7.2",
+    "yaml": "^1.10.0"
   },
   "jest": {
     "roots": [
