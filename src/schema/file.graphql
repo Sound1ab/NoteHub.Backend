@@ -1,7 +1,7 @@
 ## Base
 extend type Query {
   readFile(path: String!): File
-  readNodes: ModelNodeConnection!
+  readFiles: [File!]
 }
 
 extend type Mutation {
@@ -17,22 +17,15 @@ type Links {
 }
 
 type File {
-  filename: String!
+  id: ID!
   path: String!
-  content: String
-  excerpt: String
-  sha: String!
   type: NODE_TYPE!
+  sha: String!
   url: String!
+  filename: String
+  content: String
   messages: ModelMessageConnection
   readAt: String
-}
-
-type GitNode {
-  path: String!
-  type: NODE_TYPE!
-  sha: String!
-  url: String!
 }
 
 type Message {
@@ -60,10 +53,6 @@ type Point {
 ## Query outputs
 type ModelMessageConnection {
   nodes: [Message!]!
-}
-
-type ModelNodeConnection {
-  nodes: [GitNode!]!
 }
 
 type ModelFileConnection {

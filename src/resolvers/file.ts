@@ -1,6 +1,5 @@
 import {
   File,
-  ModelNodeConnection,
   MutationCreateFileArgs,
   MutationDeleteFileArgs,
   MutationMoveFileArgs,
@@ -23,14 +22,10 @@ export const FileQueries = {
 
     return fileManager.readFile(path)
   },
-  async readNodes(
-    _: any,
-    _1: any,
-    context: IContext
-  ): Promise<ModelNodeConnection> {
+  async readFiles(_: any, _1: any, context: IContext): Promise<File[]> {
     const fileManager = new FileManager(context)
 
-    return fileManager.readNodes()
+    return fileManager.readFiles()
   },
 }
 

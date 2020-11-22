@@ -1,10 +1,10 @@
 import {
   File,
-  ModelNodeConnection,
   MoveFileInput,
   Node_Type,
   UpdateFileInput,
 } from '../../resolvers-types'
+import { Type, encodeNodeId } from '../../utils'
 
 import { GetCommit } from '../../queries/GetCommit'
 import { GitCreateTreeResponseTreeItem } from '@octokit/rest'
@@ -39,6 +39,7 @@ export class FileManager extends Github {
         content,
         excerpt: `${content.substring(0, 50)}...`,
         filename: data.name,
+        id: encodeNodeId(Type.FILE, path),
         messages: {
           nodes: messages,
         },
@@ -54,7 +55,7 @@ export class FileManager extends Github {
     }
   }
 
-  public async readNodes(): Promise<ModelNodeConnection> {
+  public async readFiles(): Promise<File[]> {
     try {
       const {
         repository: {
@@ -78,31 +79,22 @@ export class FileManager extends Github {
         tree_sha: oid,
       })
 
-      return {
-        nodes: tree
-          .filter((node: GitCreateTreeResponseTreeItem) => {
-            return !node.path.includes('__notehub__images__')
-          })
-          .map((node: GitCreateTreeResponseTreeItem) => {
-            return {
-              ...node,
-              type: node.type === 'blob' ? Node_Type.File : Node_Type.Folder,
-            }
-          }),
-      }
+      return tree.map((node: GitCreateTreeResponseTreeItem) => {
+        return {
+          ...node,
+          id: encodeNodeId(Type.FILE, node.path),
+          type: node.type === 'blob' ? Node_Type.File : Node_Type.Folder,
+        }
+      })
     } catch (error) {
       // Repo has been setup but no changes have been made to it
       if (error.message === "Cannot read property 'history' of null") {
-        return {
-          nodes: [],
-        }
+        return []
       }
 
       // All files within the repo have been deleted
       if (error.message === 'Not Found') {
-        return {
-          nodes: [],
-        }
+        return []
       }
 
       throw new Error(error)

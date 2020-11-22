@@ -20,13 +20,13 @@ export type DeleteFileInput = {
 
 export type File = {
    __typename?: 'File',
-  filename: Scalars['String'],
+  id: Scalars['ID'],
   path: Scalars['String'],
-  content?: Maybe<Scalars['String']>,
-  excerpt?: Maybe<Scalars['String']>,
-  sha: Scalars['String'],
   type: Node_Type,
+  sha: Scalars['String'],
   url: Scalars['String'],
+  filename?: Maybe<Scalars['String']>,
+  content?: Maybe<Scalars['String']>,
   messages?: Maybe<ModelMessageConnection>,
   readAt?: Maybe<Scalars['String']>,
 };
@@ -38,14 +38,6 @@ export type GithubUser = {
   avatar_url: Scalars['String'],
   html_url: Scalars['String'],
   name: Scalars['String'],
-};
-
-export type GitNode = {
-   __typename?: 'GitNode',
-  path: Scalars['String'],
-  type: Node_Type,
-  sha: Scalars['String'],
-  url: Scalars['String'],
 };
 
 export type Links = {
@@ -81,11 +73,6 @@ export type ModelFileConnection = {
 export type ModelMessageConnection = {
    __typename?: 'ModelMessageConnection',
   nodes: Array<Message>,
-};
-
-export type ModelNodeConnection = {
-   __typename?: 'ModelNodeConnection',
-  nodes: Array<GitNode>,
 };
 
 export type ModelRepoConnection = {
@@ -169,7 +156,7 @@ export type Query = {
   logout: Scalars['String'],
   refresh?: Maybe<Scalars['String']>,
   readFile?: Maybe<File>,
-  readNodes: ModelNodeConnection,
+  readFiles?: Maybe<Array<File>>,
   readImage?: Maybe<File>,
   readRepo?: Maybe<Repo>,
   readGithubUserAccessToken: Scalars['String'],
@@ -279,6 +266,7 @@ export type ResolversTypes = {
   Query: Query,
   String: Scalars['String'],
   File: File,
+  ID: Scalars['ID'],
   NODE_TYPE: Node_Type,
   ModelMessageConnection: ModelMessageConnection,
   Message: Message,
@@ -286,8 +274,6 @@ export type ResolversTypes = {
   Location: Location,
   Point: Point,
   Boolean: Scalars['Boolean'],
-  ModelNodeConnection: ModelNodeConnection,
-  GitNode: GitNode,
   Repo: Repo,
   GithubUser: GithubUser,
   Mutation: Mutation,
@@ -302,13 +288,13 @@ export type ResolversTypes = {
 };
 
 export type FileResolvers<Context = any, ParentType = ResolversTypes['File']> = {
-  filename?: Resolver<ResolversTypes['String'], ParentType, Context>,
+  id?: Resolver<ResolversTypes['ID'], ParentType, Context>,
   path?: Resolver<ResolversTypes['String'], ParentType, Context>,
-  content?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
-  excerpt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
-  sha?: Resolver<ResolversTypes['String'], ParentType, Context>,
   type?: Resolver<ResolversTypes['NODE_TYPE'], ParentType, Context>,
+  sha?: Resolver<ResolversTypes['String'], ParentType, Context>,
   url?: Resolver<ResolversTypes['String'], ParentType, Context>,
+  filename?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
+  content?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
   messages?: Resolver<Maybe<ResolversTypes['ModelMessageConnection']>, ParentType, Context>,
   readAt?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
 };
@@ -319,13 +305,6 @@ export type GithubUserResolvers<Context = any, ParentType = ResolversTypes['Gith
   avatar_url?: Resolver<ResolversTypes['String'], ParentType, Context>,
   html_url?: Resolver<ResolversTypes['String'], ParentType, Context>,
   name?: Resolver<ResolversTypes['String'], ParentType, Context>,
-};
-
-export type GitNodeResolvers<Context = any, ParentType = ResolversTypes['GitNode']> = {
-  path?: Resolver<ResolversTypes['String'], ParentType, Context>,
-  type?: Resolver<ResolversTypes['NODE_TYPE'], ParentType, Context>,
-  sha?: Resolver<ResolversTypes['String'], ParentType, Context>,
-  url?: Resolver<ResolversTypes['String'], ParentType, Context>,
 };
 
 export type LinksResolvers<Context = any, ParentType = ResolversTypes['Links']> = {
@@ -358,10 +337,6 @@ export type ModelMessageConnectionResolvers<Context = any, ParentType = Resolver
   nodes?: Resolver<Array<ResolversTypes['Message']>, ParentType, Context>,
 };
 
-export type ModelNodeConnectionResolvers<Context = any, ParentType = ResolversTypes['ModelNodeConnection']> = {
-  nodes?: Resolver<Array<ResolversTypes['GitNode']>, ParentType, Context>,
-};
-
 export type ModelRepoConnectionResolvers<Context = any, ParentType = ResolversTypes['ModelRepoConnection']> = {
   items?: Resolver<Array<ResolversTypes['Repo']>, ParentType, Context>,
 };
@@ -389,7 +364,7 @@ export type QueryResolvers<Context = any, ParentType = ResolversTypes['Query']> 
   logout?: Resolver<ResolversTypes['String'], ParentType, Context>,
   refresh?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
   readFile?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, QueryReadFileArgs>,
-  readNodes?: Resolver<ResolversTypes['ModelNodeConnection'], ParentType, Context>,
+  readFiles?: Resolver<Maybe<Array<ResolversTypes['File']>>, ParentType, Context>,
   readImage?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, QueryReadImageArgs>,
   readRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>,
   readGithubUserAccessToken?: Resolver<ResolversTypes['String'], ParentType, Context, QueryReadGithubUserAccessTokenArgs>,
@@ -408,13 +383,11 @@ export type RepoResolvers<Context = any, ParentType = ResolversTypes['Repo']> = 
 export type Resolvers<Context = any> = {
   File?: FileResolvers<Context>,
   GithubUser?: GithubUserResolvers<Context>,
-  GitNode?: GitNodeResolvers<Context>,
   Links?: LinksResolvers<Context>,
   Location?: LocationResolvers<Context>,
   Message?: MessageResolvers<Context>,
   ModelFileConnection?: ModelFileConnectionResolvers<Context>,
   ModelMessageConnection?: ModelMessageConnectionResolvers<Context>,
-  ModelNodeConnection?: ModelNodeConnectionResolvers<Context>,
   ModelRepoConnection?: ModelRepoConnectionResolvers<Context>,
   Mutation?: MutationResolvers<Context>,
   Point?: PointResolvers<Context>,
