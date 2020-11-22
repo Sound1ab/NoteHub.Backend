@@ -168,10 +168,19 @@ export class FileManager extends Github {
   }
 
   public async moveFile({ path, newPath }: MoveFileInput): Promise<File> {
-    const { content } = await this.readFile(path)
+    try {
+      await this.readFile(newPath)
+    } catch (error) {
+      console.log('error', error.message)
+      if (error.message === 'Not Found') {
+        const { content } = await this.readFile(path)
 
-    await this.deleteFile(path)
+        await this.deleteFile(path)
 
-    return this.createFile(newPath, content)
+        return this.createFile(newPath, content)
+      }
+    }
+
+    throw new Error('File already exists')
   }
 }
