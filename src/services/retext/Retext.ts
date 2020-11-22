@@ -1,3 +1,5 @@
+import unified, { Processor } from 'unified'
+
 import dictionary from 'dictionary-en-gb'
 import equality from 'retext-equality'
 import extract from 'remark-extract-frontmatter'
@@ -5,12 +7,12 @@ import frontmatter from 'remark-frontmatter'
 import indefiniteArticle from 'retext-indefinite-article'
 import parse from 'remark-parse'
 import parseEnglish from 'parse-english'
+import readability from 'retext-readability'
 import remark2retext from 'remark-retext'
 import remarkStringify from 'remark-stringify'
 import repeated from 'retext-repeated-words'
 import retextStringify from 'retext-stringify'
 import spell from 'retext-spell'
-import unified, { Processor } from 'unified'
 import yaml from 'yaml'
 
 export enum RETEXT_SETTINGS {
@@ -18,6 +20,7 @@ export enum RETEXT_SETTINGS {
   EQUALITY = 'equality',
   INDEFINITE_ARTICLE = 'indefiniteArticle',
   REPEATED = 'repeatedWords',
+  READABILITY = 'readability',
 }
 
 export class Retext {
@@ -45,6 +48,9 @@ export class Retext {
           break
         case RETEXT_SETTINGS.REPEATED:
           retextParser.use(repeated)
+          break
+        case RETEXT_SETTINGS.READABILITY:
+          retextParser.use(readability)
           break
       }
     })
