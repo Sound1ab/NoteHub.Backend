@@ -4,12 +4,12 @@ import {
   Node_Type,
   UpdateFileInput,
 } from '../../resolvers-types'
-import { Type, encodeNodeId } from '../../utils'
 
 import { GetCommit } from '../../queries/GetCommit'
 import { GitCreateTreeResponseTreeItem } from '@octokit/rest'
 import { Github } from './Base'
 import { VFileCompatible } from 'vfile'
+import { encodeNodeId } from '../../utils'
 
 export class FileManager extends Github {
   public async readFile(path: string): Promise<File> {
@@ -39,7 +39,7 @@ export class FileManager extends Github {
         content,
         excerpt: `${content.substring(0, 50)}...`,
         filename: data.name,
-        id: encodeNodeId(Type.FILE, path),
+        id: encodeNodeId(Node_Type.File, path),
         messages: {
           nodes: messages,
         },
@@ -51,6 +51,7 @@ export class FileManager extends Github {
     return {
       ...data,
       filename: data.name,
+      id: encodeNodeId(Node_Type.Folder, path),
       type: Node_Type.Folder,
     }
   }
@@ -80,10 +81,12 @@ export class FileManager extends Github {
       })
 
       return tree.map((node: GitCreateTreeResponseTreeItem) => {
+        const type = node.type === 'blob' ? Node_Type.File : Node_Type.Folder
+
         return {
           ...node,
-          id: encodeNodeId(Type.FILE, node.path),
-          type: node.type === 'blob' ? Node_Type.File : Node_Type.Folder,
+          id: encodeNodeId(type, node.path),
+          type,
         }
       })
     } catch (error) {
@@ -171,7 +174,6 @@ export class FileManager extends Github {
     try {
       await this.readFile(newPath)
     } catch (error) {
-      console.log('error', error.message)
       if (error.message === 'Not Found') {
         const { content } = await this.readFile(path)
 
