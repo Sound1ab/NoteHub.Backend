@@ -9,16 +9,14 @@ import {
 
 import { FileManager } from '../services'
 import { IContext } from '../server'
-import { Retext } from '../services/retext/Retext'
 
 export const FileQueries = {
   async readFile(
     _: any,
-    { path }: QueryReadFileArgs,
+    { path, retextSettings }: QueryReadFileArgs,
     context: IContext
   ): Promise<File> {
-    const retext = new Retext()
-    const fileManager = new FileManager(context, retext)
+    const fileManager = new FileManager(context, retextSettings)
 
     return fileManager.readFile(path)
   },
@@ -32,23 +30,21 @@ export const FileQueries = {
 export const FileMutations = {
   async createFile(
     _: any,
-    { input: { path, content } }: MutationCreateFileArgs,
+    { input: { path, content, retextSettings } }: MutationCreateFileArgs,
     context: IContext
   ): Promise<File> {
-    const retext = new Retext()
-    const fileManager = new FileManager(context, retext)
+    const fileManager = new FileManager(context, retextSettings)
 
     return fileManager.createFile(path, content)
   },
   async updateFile(
     _: any,
-    { input }: MutationUpdateFileArgs,
+    { input: { path, content, retextSettings } }: MutationUpdateFileArgs,
     context: IContext
   ): Promise<File> {
-    const retext = new Retext()
-    const fileManager = new FileManager(context, retext)
+    const fileManager = new FileManager(context, retextSettings)
 
-    return fileManager.updateFile(input)
+    return fileManager.updateFile({ path, content })
   },
   async deleteFile(
     _: any,

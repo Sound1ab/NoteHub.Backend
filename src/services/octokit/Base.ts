@@ -2,7 +2,6 @@ import { GraphQLClient } from 'graphql-request'
 import { IContext } from '../../server'
 import { JwtManager } from '..'
 import Octokit from '@octokit/rest'
-import { Retext } from '../retext/Retext'
 // @ts-ignore
 import Throttle from '@octokit/plugin-throttling'
 import { decrypt } from '../../utils'
@@ -42,18 +41,15 @@ export class Github {
   public graphql: GraphQLClient
   public repo = 'NoteHub.Notebook'
   public owner: string
-  public retext?: Retext
   private userAgent = 'noted-api-v1'
 
-  constructor({ jwt }: Pick<IContext, 'jwt'>, retext?: Retext) {
+  constructor({ jwt }: Pick<IContext, 'jwt'>) {
     const { accessToken, owner } = this.verifyJwtAndGetUserDetails(jwt)
 
     this.octokit = this.initOctokit(accessToken)
     this.graphql = this.initGraphQL(accessToken)
 
     this.owner = owner
-
-    this.retext = retext
   }
 
   public initOctokitWithAccessToken(accessToken: string): this {

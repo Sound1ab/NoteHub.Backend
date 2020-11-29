@@ -1,79 +1,42 @@
-import { RETEXT_SETTINGS, Retext } from './Retext'
+import { Retext } from './Retext'
+import { Retext_Settings } from '../../resolvers-types'
 
 describe('Retext', () => {
-  const retext = new Retext()
-  describe('when processing frontmatter', () => {
-    const availablePlugins = [
-      'readability',
-      'spell',
-      'equality',
-      'indefiniteArticle',
-      'repeatedWords',
-    ]
-
-    const unavilablePlugin = 'astrology'
-
-    it('should return a list of plugins', async () => {
-      const markdown = `---\nretext:\n  - readability\n  - spell\n  - equality\n  - indefiniteArticle\n  - repeatedWords\n---\n\n# hello`
-
-      const result = await retext.processFrontMatter(markdown)
-
-      expect(result).toEqual(availablePlugins)
-    })
-
-    it('should should exclude any plugins that are not available', async () => {
-      const markdown = `---\nretext:\n  - readability\n  - spell\n  - equality\n  - indefiniteArticle\n  - repeatedWords\n  - ${unavilablePlugin}\n---\n\n# hello`
-
-      const result = await retext.processFrontMatter(markdown)
-
-      expect(result).toEqual(availablePlugins)
-    })
-
-    it('should return undefined if retext option is not passed', async () => {
-      const markdown = `---\nsomeotherthing:\n  - readability\n  - spell\n  - equality\n  - indefiniteArticle\n  - repeatedWords\n  - ${unavilablePlugin}\n---\n\n# hello`
-
-      const result = await retext.processFrontMatter(markdown)
-
-      expect(result).toEqual(undefined)
-    })
-
-    it('should return undefined if no frontmatter is passed', async () => {
-      const markdown = `# hello`
-
-      const result = await retext.processFrontMatter(markdown)
-
-      expect(result).toEqual(undefined)
-    })
-  })
-
   describe('addPlugin', () => {
-    it.each(Object.values(RETEXT_SETTINGS))(
-      'should add the specified plugin',
-      async option => {
-        const result = await retext.addPlugin([option])
+    it.each([
+      [Retext_Settings.Spell, 'spell'],
+      [Retext_Settings.Readability, 'readability'],
+      [Retext_Settings.RepeatedWords, 'repeatedWords'],
+      [Retext_Settings.IndefiniteArticle, 'indefiniteArticle'],
+      [Retext_Settings.Equality, 'equality'],
+    ])('should add the specified plugin', async (retextSetting, plugin) => {
+      const retext = new Retext([retextSetting])
 
-        const plugins = (result as any).attachers.map(
-          (attacher: any) => attacher[0].name
-        )
-
-        expect(plugins).toContain(option)
-      }
-    )
-
-    it('should add multiple plugins', async () => {
-      const result = await retext.addPlugin([
-        RETEXT_SETTINGS.SPELLING,
-        RETEXT_SETTINGS.REPEATED,
-        RETEXT_SETTINGS.READABILITY,
-      ])
+      const result = await retext.createParser()
 
       const plugins = (result as any).attachers.map(
         (attacher: any) => attacher[0].name
       )
 
-      expect(plugins).toContain(RETEXT_SETTINGS.SPELLING)
-      expect(plugins).toContain(RETEXT_SETTINGS.REPEATED)
-      expect(plugins).toContain(RETEXT_SETTINGS.READABILITY)
+      expect(plugins).toContain(plugin)
+    })
+
+    it('should add multiple plugins', async () => {
+      const retext = new Retext([
+        Retext_Settings.Spell,
+        Retext_Settings.Equality,
+        Retext_Settings.IndefiniteArticle,
+      ])
+
+      const result = await retext.createParser()
+
+      const plugins = (result as any).attachers.map(
+        (attacher: any) => attacher[0].name
+      )
+
+      expect(plugins).toContain('spell')
+      expect(plugins).toContain('equality')
+      expect(plugins).toContain('indefiniteArticle')
     })
   })
 
@@ -93,10 +56,12 @@ describe('Retext', () => {
       const repeated = 'this this is repeated myself '
       const readability = `The constellation also contains an isolated neutron star—Calvera—and H1504+65, the hottest white dwarf yet discovered, with a surface temperature of 200,000 kelvin`
 
+      const retext = new Retext(Object.values(Retext_Settings))
+
       const markdown =
         spell + equality + indefiniteArticle + repeated + readability
 
-      const parser = await retext.addPlugin(Object.values(RETEXT_SETTINGS))
+      const parser = await retext.createParser()
 
       const messages = await retext.processMarkdownTree(markdown, parser)
 

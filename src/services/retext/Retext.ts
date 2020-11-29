@@ -1,5 +1,6 @@
 import unified, { Processor } from 'unified'
 
+import { Retext_Settings } from '../../resolvers-types'
 import dictionary from 'dictionary-en-gb'
 import equality from 'retext-equality'
 import extract from 'remark-extract-frontmatter'
@@ -15,14 +16,6 @@ import retextStringify from 'retext-stringify'
 import spell from 'retext-spell'
 import yaml from 'yaml'
 
-export enum RETEXT_SETTINGS {
-  SPELLING = 'spell',
-  EQUALITY = 'equality',
-  INDEFINITE_ARTICLE = 'indefiniteArticle',
-  REPEATED = 'repeatedWords',
-  READABILITY = 'readability',
-}
-
 export class Retext {
   private frontMatterParser = unified()
     .use(parse)
@@ -30,26 +23,32 @@ export class Retext {
     .use(frontmatter)
     .use(extract, { yaml: yaml.parse })
 
-  public addPlugin(options: RETEXT_SETTINGS[]) {
+  private retextSettings: Retext_Settings[]
+
+  constructor(retextSettings: Retext_Settings[]) {
+    this.retextSettings = retextSettings
+  }
+
+  public createParser() {
     const retextParser = unified()
       .use(parse)
       .use(remark2retext, parseEnglish)
 
-    options.forEach(option => {
+    this.retextSettings.forEach(option => {
       switch (option) {
-        case RETEXT_SETTINGS.SPELLING:
+        case Retext_Settings.Spell:
           retextParser.use(spell, dictionary)
           break
-        case RETEXT_SETTINGS.EQUALITY:
+        case Retext_Settings.Equality:
           retextParser.use(equality)
           break
-        case RETEXT_SETTINGS.INDEFINITE_ARTICLE:
+        case Retext_Settings.IndefiniteArticle:
           retextParser.use(indefiniteArticle)
           break
-        case RETEXT_SETTINGS.REPEATED:
+        case Retext_Settings.RepeatedWords:
           retextParser.use(repeated)
           break
-        case RETEXT_SETTINGS.READABILITY:
+        case Retext_Settings.Readability:
           retextParser.use(readability)
           break
       }
@@ -95,8 +94,8 @@ export class Retext {
     return retext.filter(this.isString).filter(this.isPlugin)
   }
 
-  private isPlugin(value: string): value is RETEXT_SETTINGS {
-    return Object.values(RETEXT_SETTINGS).includes(value as RETEXT_SETTINGS)
+  private isPlugin(value: string): value is Retext_Settings {
+    return Object.values(Retext_Settings).includes(value as Retext_Settings)
   }
 
   private hasRetextProperty(data: {

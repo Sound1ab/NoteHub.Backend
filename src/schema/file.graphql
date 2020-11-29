@@ -1,6 +1,6 @@
 ## Base
 extend type Query {
-  readFile(path: String!): File
+  readFile(path: String!, retextSettings: [RETEXT_SETTINGS!]): File
   readFiles: [File!]
 }
 
@@ -63,11 +63,13 @@ type ModelFileConnection {
 input CreateFileInput {
   path: String!
   content: String
+  retextSettings: [RETEXT_SETTINGS!]
 }
 
 input UpdateFileInput {
   path: String!
   content: String
+  retextSettings: [RETEXT_SETTINGS!]
 }
 
 input MoveFileInput {
@@ -83,4 +85,12 @@ input DeleteFileInput {
 enum NODE_TYPE {
   FILE
   FOLDER
+}
+
+enum RETEXT_SETTINGS {
+  SPELL
+  EQUALITY
+  INDEFINITE_ARTICLE
+  REPEATED_WORDS
+  READABILITY
 }

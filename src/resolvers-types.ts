@@ -12,6 +12,7 @@ export type Scalars = {
 export type CreateFileInput = {
   path: Scalars['String'],
   content?: Maybe<Scalars['String']>,
+  retextSettings?: Maybe<Array<Retext_Settings>>,
 };
 
 export type DeleteFileInput = {
@@ -165,7 +166,8 @@ export type Query = {
 
 
 export type QueryReadFileArgs = {
-  path: Scalars['String']
+  path: Scalars['String'],
+  retextSettings?: Maybe<Array<Retext_Settings>>
 };
 
 
@@ -189,9 +191,18 @@ export type Repo = {
   private: Scalars['Boolean'],
 };
 
+export enum Retext_Settings {
+  Spell = 'SPELL',
+  Equality = 'EQUALITY',
+  IndefiniteArticle = 'INDEFINITE_ARTICLE',
+  RepeatedWords = 'REPEATED_WORDS',
+  Readability = 'READABILITY'
+}
+
 export type UpdateFileInput = {
   path: Scalars['String'],
   content?: Maybe<Scalars['String']>,
+  retextSettings?: Maybe<Array<Retext_Settings>>,
 };
 
 export type UpdateRepoInput = {
@@ -265,6 +276,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   Query: Query,
   String: Scalars['String'],
+  RETEXT_SETTINGS: Retext_Settings,
   File: File,
   ID: Scalars['ID'],
   NODE_TYPE: Node_Type,
