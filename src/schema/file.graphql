@@ -1,6 +1,6 @@
 ## Base
 extend type Query {
-  readFile(path: String!, retextSettings: [RETEXT_SETTINGS!]): File
+  readFile(path: String!): File
   readFiles: [File!]
 }
 
@@ -24,37 +24,9 @@ type File {
   url: String!
   filename: String
   content: String
-  messages: ModelMessageConnection
-  readAt: String
-}
-
-type Message {
-  message: String
-  name: String
-  reason: String
-  line: Int
-  column: Int
-  location: Location
-  actual: Int
-  source: String
-  ruleId: String
-  fatal: Boolean
-}
-
-type Location {
-  start: Point
-  end: Point
-}
-
-type Point {
-  offset: Int
 }
 
 ## Query outputs
-type ModelMessageConnection {
-  nodes: [Message!]!
-}
-
 type ModelFileConnection {
   items: [File!]!
 }

@@ -2,29 +2,15 @@ import {
   File,
   MoveFileInput,
   Node_Type,
-  Retext_Settings,
   UpdateFileInput,
 } from '../../resolvers-types'
 
 import { GetCommit } from '../../queries/GetCommit'
 import { GitCreateTreeResponseTreeItem } from '@octokit/rest'
 import { Github } from './Base'
-import { IContext } from '../../server'
-import { Retext } from '../retext/Retext'
-import { VFileCompatible } from 'vfile'
 import { encodeNodeId } from '../../utils'
 
 export class FileManager extends Github {
-  private readonly retext?: Retext
-
-  constructor(context: IContext, retextSettings?: Retext_Settings[] | null) {
-    super(context)
-
-    if (retextSettings) {
-      this.retext = new Retext(retextSettings)
-    }
-  }
-
   public async readFile(path: string): Promise<File> {
     const { data } = await this.octokit.repos.getContents({
       owner: this.owner,
@@ -35,24 +21,12 @@ export class FileManager extends Github {
     if (data.type === 'file') {
       const content = Github.decodeFromBase64(data.content)
 
-      let messages: VFileCompatible[] = []
-
-      if (this.retext) {
-        const parser = await this.retext.createParser()
-
-        messages = await this.retext.processMarkdownTree(content, parser)
-      }
-
       return {
         ...data,
         content,
         excerpt: `${content.substring(0, 50)}...`,
         filename: data.name,
         id: encodeNodeId(Node_Type.File, path),
-        messages: {
-          nodes: messages,
-        },
-        readAt: Date.now().toString(),
         type: Node_Type.File,
       }
     }
