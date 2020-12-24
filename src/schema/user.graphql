@@ -10,5 +10,5 @@ type GithubUser {
   login: String!
   avatar_url: String!
   html_url: String!
-  name: String!
+  name: String
 }

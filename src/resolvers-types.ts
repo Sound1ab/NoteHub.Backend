@@ -36,7 +36,7 @@ export type GithubUser = {
   login: Scalars['String'],
   avatar_url: Scalars['String'],
   html_url: Scalars['String'],
-  name: Scalars['String'],
+  name?: Maybe<Scalars['String']>,
 };
 
 export type Links = {
@@ -277,7 +277,7 @@ export type GithubUserResolvers<Context = any, ParentType = ResolversTypes['Gith
   login?: Resolver<ResolversTypes['String'], ParentType, Context>,
   avatar_url?: Resolver<ResolversTypes['String'], ParentType, Context>,
   html_url?: Resolver<ResolversTypes['String'], ParentType, Context>,
-  name?: Resolver<ResolversTypes['String'], ParentType, Context>,
+  name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
 };
 
 export type LinksResolvers<Context = any, ParentType = ResolversTypes['Links']> = {
