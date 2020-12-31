@@ -51,6 +51,12 @@ functions:
       - http:
           method: get
           path: hello
+  webhook:
+    handler: src/handlers.webhook
+    events:
+      - http:
+          method: post
+          path: webhook
   graphql:
     handler: src/handlers.graphql
     timeout: 10

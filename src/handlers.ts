@@ -21,3 +21,18 @@ export const hello: APIGatewayProxyHandler = async event => {
     statusCode: 200,
   }
 }
+
+export const webhook: APIGatewayProxyHandler = async event => {
+  console.log('we got the hook!', event)
+  return {
+    body: JSON.stringify(
+      {
+        input: event,
+        message: 'Webhook received!',
+      },
+      null,
+      2
+    ),
+    statusCode: 200,
+  }
+}
