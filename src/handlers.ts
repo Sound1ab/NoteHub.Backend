@@ -1,6 +1,6 @@
 import { APIGatewayProxyHandler } from 'aws-lambda'
-import { forwardGitRequest } from './proxy'
 import { configureServer } from './server'
+import { forwardGitRequest } from './proxy/forwardGitRequest'
 
 export const graphql = configureServer().createHandler({
   cors: {
@@ -39,5 +39,24 @@ export const webhook: APIGatewayProxyHandler = async event => {
 }
 
 export const proxy = async (event: any) => {
-  return forwardGitRequest(event)
+  try {
+    const response = await forwardGitRequest(event)
+
+    return {
+      ...response,
+      headers: {
+        ...response.headers,
+        'Access-Control-Allow-Credentials': 'true',
+        'Access-Control-Allow-Headers': 'Authorization',
+        'Access-Control-Allow-Origin': '*',
+      },
+    }
+  } catch (e) {
+    console.log('Error: ', e.message)
+
+    return {
+      body: JSON.stringify(e.message),
+      statusCode: 500,
+    }
+  }
 }

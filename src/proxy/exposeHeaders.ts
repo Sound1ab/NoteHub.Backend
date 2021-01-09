@@ -1,0 +1,17 @@
+export const exposeHeaders = [
+  'accept-ranges',
+  'age',
+  'cache-control',
+  'content-length',
+  'content-language',
+  'content-type',
+  'date',
+  'etag',
+  'expires',
+  'last-modified',
+  'pragma',
+  'server',
+  'vary',
+  'x-github-request-id',
+  'x-redirected-url',
+]
