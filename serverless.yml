@@ -57,6 +57,28 @@ functions:
       - http:
           method: post
           path: webhook
+  proxy:
+    handler: src/handlers.proxy
+    events:
+      - http:
+          method: ANY
+          path: proxy/{proxy+}
+          contentHandling: CONVERT_TO_BINARY
+          cors:
+            origins:
+              - 'http://localhost:8080'
+              - 'http://noted-development.s3-website-eu-west-1.amazonaws.com'
+              - 'https://notehub.xyz'
+              - 'https://www.notehub.xyz'
+            allowCredentials: true
+            headers:
+              - Content-Type
+              - X-Amz-Date
+              - Authorization
+              - X-Api-Key
+              - X-Amz-Security-Token
+              - X-Amz-User-Agent
+              - Owner
   graphql:
     handler: src/handlers.graphql
     timeout: 10

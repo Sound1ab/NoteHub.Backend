@@ -1,4 +1,5 @@
 import { APIGatewayProxyHandler } from 'aws-lambda'
+import { forwardGitRequest } from './proxy'
 import { configureServer } from './server'
 
 export const graphql = configureServer().createHandler({
@@ -35,4 +36,8 @@ export const webhook: APIGatewayProxyHandler = async event => {
     ),
     statusCode: 200,
   }
+}
+
+export const proxy = async (event: any) => {
+  return forwardGitRequest(event)
 }
