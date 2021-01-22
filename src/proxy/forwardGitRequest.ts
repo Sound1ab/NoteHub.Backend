@@ -64,7 +64,9 @@ export async function forwardGitRequest(event: APIGatewayProxyEvent) {
   const isSmartRequest = httpMethod === 'POST'
 
   return {
-    body: isSmartRequest ? await response.buffer() : await response.text(),
+    body: isSmartRequest
+      ? Buffer.from(await response.buffer()).toString('base64')
+      : await response.text(),
     headers: responseHeaders,
     isBase64Encoded: isSmartRequest,
     statusCode: 200,

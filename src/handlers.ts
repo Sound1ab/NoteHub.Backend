@@ -52,8 +52,6 @@ export const proxy = async (event: any) => {
       },
     }
   } catch (e) {
-    console.log('Error: ', e.message)
-
     return {
       body: JSON.stringify(e.message),
       statusCode: 500,
