@@ -32,6 +32,8 @@ provider:
   apiGateway:
     binaryMediaTypes:
       - 'application/x-git-upload-pack-result'
+      - 'application/x-git-receive-pack-result'
+      - 'application/x-git-receive-pack-request'
 
 custom:
   webpack:

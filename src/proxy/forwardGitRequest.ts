@@ -14,7 +14,20 @@ export async function forwardGitRequest(event: APIGatewayProxyEvent) {
     queryStringParameters,
     body: requestBody,
     headers,
+    isBase64Encoded,
   } = event
+
+  console.log('here', event)
+
+  if (requestBody) {
+    console.log(
+      'here',
+      httpMethod,
+      pathParameters,
+      isBase64Encoded,
+      requestBody
+    )
+  }
 
   if (httpMethod === 'OPTIONS') {
     return {
@@ -47,7 +60,11 @@ export async function forwardGitRequest(event: APIGatewayProxyEvent) {
   const url = queryString ? `${base}?${queryString}` : base
 
   const response = await fetch(url, {
-    body: requestBody ? requestBody : undefined,
+    body: !requestBody
+      ? undefined
+      : isBase64Encoded
+      ? Buffer.from(requestBody, 'base64')
+      : requestBody,
     headers: requestHeaders,
     method: httpMethod,
   })

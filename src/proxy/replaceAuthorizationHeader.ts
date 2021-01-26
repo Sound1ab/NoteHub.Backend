@@ -8,14 +8,20 @@ export function replaceAuthorizationHeader(headers: Record<string, string>) {
 
   const jwt = extractJwtFromAuth(authorization)
 
-  const accessToken = jwt ? verifyJwtAndGetUserDetails(jwt).accessToken : null
+  try {
+    const accessToken = jwt ? verifyJwtAndGetUserDetails(jwt).accessToken : null
 
-  return {
-    ...rest,
-    ...(accessToken
-      ? {
-          Authorization: `Basic ${Buffer.from(accessToken).toString('base64')}`,
-        }
-      : undefined),
+    return {
+      ...rest,
+      ...(accessToken
+        ? {
+            Authorization: `Basic ${Buffer.from(accessToken).toString(
+              'base64'
+            )}`,
+          }
+        : undefined),
+    }
+  } catch {
+    return rest
   }
 }
