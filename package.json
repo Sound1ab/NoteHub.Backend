@@ -46,7 +46,7 @@
   },
   "dependencies": {
     "@octokit/plugin-throttling": "^2.4.0",
-    "@octokit/rest": "^16.25.1",
+    "@octokit/rest": "^18.0.15",
     "apollo-link-http-common": "^0.2.16",
     "apollo-server-lambda": "^2.9.16",
     "aws-sdk": "^2.606.0",
