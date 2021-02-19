@@ -17,18 +17,6 @@ export async function forwardGitRequest(event: APIGatewayProxyEvent) {
     isBase64Encoded,
   } = event
 
-  console.log('here', event)
-
-  if (requestBody) {
-    console.log(
-      'here',
-      httpMethod,
-      pathParameters,
-      isBase64Encoded,
-      requestBody
-    )
-  }
-
   if (httpMethod === 'OPTIONS') {
     return {
       statusCode: 200,
@@ -60,6 +48,9 @@ export async function forwardGitRequest(event: APIGatewayProxyEvent) {
   const url = queryString ? `${base}?${queryString}` : base
 
   const response = await fetch(url, {
+    // lambda-proxy binary request payloads are always converted to base64
+    // serverless-offline is not so we need to convert back to a buffer
+    // when running in api gateway
     body: !requestBody
       ? undefined
       : isBase64Encoded

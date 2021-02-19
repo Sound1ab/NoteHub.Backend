@@ -35,9 +35,15 @@ export const UserQueries = {
 
     return jwt
   },
-  readGithubUser(_0: any, _1: any, context: IContext): Promise<GithubUser> {
+  async readGithubUser(
+    _0: any,
+    _1: any,
+    context: IContext
+  ): Promise<GithubUser> {
     const userManager = new UserManager(context)
 
-    return userManager.readUser()
+    const user = await userManager.readUser()
+
+    // get user configuration from dynamodb
   },
 }

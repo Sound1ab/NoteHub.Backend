@@ -1,0 +1,4 @@
+## Base
+extend type Query {
+  updateConnectedRepos(full_name: String!): [String!]
+}

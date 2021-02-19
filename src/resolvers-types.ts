@@ -9,6 +9,12 @@ export type Scalars = {
   Float: number,
 };
 
+export type Configuration = {
+   __typename?: 'Configuration',
+  id: Scalars['Int'],
+  connectedRepos?: Maybe<Array<Scalars['String']>>,
+};
+
 export type CreateFileInput = {
   path: Scalars['String'],
   content?: Maybe<Scalars['String']>,
@@ -37,6 +43,7 @@ export type GithubUser = {
   avatar_url: Scalars['String'],
   html_url: Scalars['String'],
   name?: Maybe<Scalars['String']>,
+  configuration?: Maybe<Configuration>,
 };
 
 export type Links = {
@@ -124,12 +131,18 @@ export type Query = {
   login: Scalars['String'],
   logout: Scalars['String'],
   refresh?: Maybe<Scalars['String']>,
+  updateConnectedRepos?: Maybe<Array<Scalars['String']>>,
   readFile?: Maybe<File>,
   readFiles?: Maybe<Array<File>>,
   readImage?: Maybe<File>,
   readRepo?: Maybe<Repo>,
   readGithubUserAccessToken: Scalars['String'],
   readGithubUser?: Maybe<GithubUser>,
+};
+
+
+export type QueryUpdateConnectedReposArgs = {
+  full_name: Scalars['String']
 };
 
 
@@ -250,6 +263,7 @@ export type ResolversTypes = {
   Int: Scalars['Int'],
   Boolean: Scalars['Boolean'],
   GithubUser: GithubUser,
+  Configuration: Configuration,
   Mutation: Mutation,
   CreateFileInput: CreateFileInput,
   RETEXT_SETTINGS: Retext_Settings,
@@ -260,6 +274,11 @@ export type ResolversTypes = {
   Links: Links,
   ModelFileConnection: ModelFileConnection,
   ModelRepoConnection: ModelRepoConnection,
+};
+
+export type ConfigurationResolvers<Context = any, ParentType = ResolversTypes['Configuration']> = {
+  id?: Resolver<ResolversTypes['Int'], ParentType, Context>,
+  connectedRepos?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, Context>,
 };
 
 export type FileResolvers<Context = any, ParentType = ResolversTypes['File']> = {
@@ -278,6 +297,7 @@ export type GithubUserResolvers<Context = any, ParentType = ResolversTypes['Gith
   avatar_url?: Resolver<ResolversTypes['String'], ParentType, Context>,
   html_url?: Resolver<ResolversTypes['String'], ParentType, Context>,
   name?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
+  configuration?: Resolver<Maybe<ResolversTypes['Configuration']>, ParentType, Context>,
 };
 
 export type LinksResolvers<Context = any, ParentType = ResolversTypes['Links']> = {
@@ -310,6 +330,7 @@ export type QueryResolvers<Context = any, ParentType = ResolversTypes['Query']> 
   login?: Resolver<ResolversTypes['String'], ParentType, Context>,
   logout?: Resolver<ResolversTypes['String'], ParentType, Context>,
   refresh?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
+  updateConnectedRepos?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, Context, QueryUpdateConnectedReposArgs>,
   readFile?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, QueryReadFileArgs>,
   readFiles?: Resolver<Maybe<Array<ResolversTypes['File']>>, ParentType, Context>,
   readImage?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, QueryReadImageArgs>,
@@ -328,6 +349,7 @@ export type RepoResolvers<Context = any, ParentType = ResolversTypes['Repo']> = 
 };
 
 export type Resolvers<Context = any> = {
+  Configuration?: ConfigurationResolvers<Context>,
   File?: FileResolvers<Context>,
   GithubUser?: GithubUserResolvers<Context>,
   Links?: LinksResolvers<Context>,

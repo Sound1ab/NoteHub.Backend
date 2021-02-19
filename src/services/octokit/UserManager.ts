@@ -1,3 +1,4 @@
+import { GithubUser } from '../../resolvers-types'
 import { Github } from './Base'
 import axios from 'axios'
 
@@ -27,7 +28,7 @@ export class UserManager extends Github {
     }
   }
 
-  public async readUser() {
+  public async readUser(): Promise<GithubUser> {
     const { data } = await this.octokit.users.getAuthenticated()
     return data
   }
