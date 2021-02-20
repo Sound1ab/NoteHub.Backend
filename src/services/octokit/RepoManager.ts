@@ -11,6 +11,16 @@ export class RepoManager extends Github {
     return data
   }
 
+  public async listRepos(): Promise<Repo[]> {
+    const { data } = await this.octokit.repos.listForUser({
+      per_page: 100,
+      sort: 'updated',
+      username: this.owner,
+    })
+    console.log('here', data)
+    return data
+  }
+
   public async createRepo(): Promise<Repo> {
     const { data } = await this.octokit.repos.createForAuthenticatedUser({
       description: 'A place to keep all notes created by Notehub',

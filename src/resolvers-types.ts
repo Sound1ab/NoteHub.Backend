@@ -142,6 +142,7 @@ export type Query = {
   readFiles?: Maybe<Array<File>>,
   readImage?: Maybe<File>,
   readRepo?: Maybe<Repo>,
+  listRepos?: Maybe<Array<Repo>>,
   readGithubUserAccessToken: Scalars['String'],
   readGithubUser?: Maybe<GithubUser>,
 };
@@ -341,6 +342,7 @@ export type QueryResolvers<Context = any, ParentType = ResolversTypes['Query']> 
   readFiles?: Resolver<Maybe<Array<ResolversTypes['File']>>, ParentType, Context>,
   readImage?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, QueryReadImageArgs>,
   readRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>,
+  listRepos?: Resolver<Maybe<Array<ResolversTypes['Repo']>>, ParentType, Context>,
   readGithubUserAccessToken?: Resolver<ResolversTypes['String'], ParentType, Context, QueryReadGithubUserAccessTokenArgs>,
   readGithubUser?: Resolver<Maybe<ResolversTypes['GithubUser']>, ParentType, Context>,
 };

@@ -9,6 +9,11 @@ export const RepoQueries = {
 
     return repoManager.readRepo()
   },
+  async listRepos(_: any, _1: any, context: IContext): Promise<Repo[]> {
+    const repoManager = new RepoManager(context)
+
+    return repoManager.listRepos()
+  },
 }
 
 export const RepoMutations = {

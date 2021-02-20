@@ -1,6 +1,7 @@
 ## Base
 extend type Query {
   readRepo: Repo
+  listRepos: [Repo!]
 }
 
 type Mutation {
