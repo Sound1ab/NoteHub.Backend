@@ -1,4 +1,13 @@
 ## Base
-extend type Query {
-  updateConnectedRepos(full_name: String!): [String!]
+extend type Mutation {
+  updateConfiguration(input: UpdateConfigurationInput!): Configuration
+}
+
+input UpdateConfigurationInput {
+  connectedRepos: [String!]
+}
+
+type Configuration {
+  id: String!
+  connectedRepos: [String!]
 }

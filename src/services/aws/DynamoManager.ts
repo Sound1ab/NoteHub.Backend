@@ -19,7 +19,7 @@ export class DynamoManager {
     this.TableName = tableName
   }
 
-  public async create(id: string, values: Record<string, string>) {
+  public async create(id: string, values?: Record<string, any>) {
     const timestamp = new Date().getTime()
 
     const params = {
@@ -69,6 +69,51 @@ export class DynamoManager {
       return response
     } catch (error) {
       throw new Error(`DynamoDB delete error: ${error}`)
+    }
+  }
+
+  public async put(id: string, values: Record<string, any>) {
+    const timestamp = new Date().getTime()
+
+    const params = {
+      Item: {
+        ...values,
+        id,
+        updatedAt: timestamp,
+      },
+      TableName: this.TableName,
+    }
+
+    try {
+      const response = await dynamoDb.put(params).promise()
+      return response
+    } catch (error) {
+      throw new Error(`DynamoDB put error: ${error}`)
+    }
+  }
+
+  public async update(
+    id: string,
+    updateExpression: string,
+    expressionAttributeNames: Record<string, any>,
+    expressionAttributeValues: Record<string, any>
+  ) {
+    const params = {
+      ExpressionAttributeNames: expressionAttributeNames,
+      ExpressionAttributeValues: expressionAttributeValues,
+      Key: {
+        id,
+      },
+      ReturnValues: 'ALL_NEW',
+      TableName: this.TableName,
+      UpdateExpression: updateExpression,
+    }
+
+    try {
+      const response = await dynamoDb.update(params).promise()
+      return response
+    } catch (error) {
+      throw new Error(`DynamoDB update error: ${error}`)
     }
   }
 }

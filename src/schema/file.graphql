@@ -57,6 +57,7 @@ input DeleteFileInput {
 enum NODE_TYPE {
   FILE
   FOLDER
+  USER
 }
 
 enum RETEXT_SETTINGS {

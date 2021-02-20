@@ -1,4 +1,5 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda'
+import { ConfigurationMutations } from './resolvers/configuration'
 import { FileMutations, FileQueries } from './resolvers/file'
 import { ImageMutations, ImageQueries } from './resolvers/image'
 import { RepoMutations, RepoQueries } from './resolvers/repo'
@@ -23,6 +24,7 @@ export function configureServer() {
       ...RepoMutations,
       ...FileMutations,
       ...ImageMutations,
+      ...ConfigurationMutations,
     },
     Query: {
       ...UserQueries,

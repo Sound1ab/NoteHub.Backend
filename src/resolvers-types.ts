@@ -11,7 +11,7 @@ export type Scalars = {
 
 export type Configuration = {
    __typename?: 'Configuration',
-  id: Scalars['Int'],
+  id: Scalars['String'],
   connectedRepos?: Maybe<Array<Scalars['String']>>,
 };
 
@@ -68,6 +68,7 @@ export type MoveFileInput = {
 
 export type Mutation = {
    __typename?: 'Mutation',
+  updateConfiguration?: Maybe<Configuration>,
   createFile?: Maybe<File>,
   updateFile?: Maybe<File>,
   deleteFile?: Maybe<File>,
@@ -79,6 +80,11 @@ export type Mutation = {
   createRepo?: Maybe<Repo>,
   updateRepo?: Maybe<Repo>,
   deleteRepo?: Maybe<Repo>,
+};
+
+
+export type MutationUpdateConfigurationArgs = {
+  input: UpdateConfigurationInput
 };
 
 
@@ -123,7 +129,8 @@ export type MutationUpdateRepoArgs = {
 
 export enum Node_Type {
   File = 'FILE',
-  Folder = 'FOLDER'
+  Folder = 'FOLDER',
+  User = 'USER'
 }
 
 export type Query = {
@@ -131,18 +138,12 @@ export type Query = {
   login: Scalars['String'],
   logout: Scalars['String'],
   refresh?: Maybe<Scalars['String']>,
-  updateConnectedRepos?: Maybe<Array<Scalars['String']>>,
   readFile?: Maybe<File>,
   readFiles?: Maybe<Array<File>>,
   readImage?: Maybe<File>,
   readRepo?: Maybe<Repo>,
   readGithubUserAccessToken: Scalars['String'],
   readGithubUser?: Maybe<GithubUser>,
-};
-
-
-export type QueryUpdateConnectedReposArgs = {
-  full_name: Scalars['String']
 };
 
 
@@ -178,6 +179,10 @@ export enum Retext_Settings {
   RepeatedWords = 'REPEATED_WORDS',
   Readability = 'READABILITY'
 }
+
+export type UpdateConfigurationInput = {
+  connectedRepos?: Maybe<Array<Scalars['String']>>,
+};
 
 export type UpdateFileInput = {
   path: Scalars['String'],
@@ -265,6 +270,7 @@ export type ResolversTypes = {
   GithubUser: GithubUser,
   Configuration: Configuration,
   Mutation: Mutation,
+  UpdateConfigurationInput: UpdateConfigurationInput,
   CreateFileInput: CreateFileInput,
   RETEXT_SETTINGS: Retext_Settings,
   UpdateFileInput: UpdateFileInput,
@@ -277,7 +283,7 @@ export type ResolversTypes = {
 };
 
 export type ConfigurationResolvers<Context = any, ParentType = ResolversTypes['Configuration']> = {
-  id?: Resolver<ResolversTypes['Int'], ParentType, Context>,
+  id?: Resolver<ResolversTypes['String'], ParentType, Context>,
   connectedRepos?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, Context>,
 };
 
@@ -313,6 +319,7 @@ export type ModelRepoConnectionResolvers<Context = any, ParentType = ResolversTy
 };
 
 export type MutationResolvers<Context = any, ParentType = ResolversTypes['Mutation']> = {
+  updateConfiguration?: Resolver<Maybe<ResolversTypes['Configuration']>, ParentType, Context, MutationUpdateConfigurationArgs>,
   createFile?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, MutationCreateFileArgs>,
   updateFile?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, MutationUpdateFileArgs>,
   deleteFile?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, MutationDeleteFileArgs>,
@@ -330,7 +337,6 @@ export type QueryResolvers<Context = any, ParentType = ResolversTypes['Query']> 
   login?: Resolver<ResolversTypes['String'], ParentType, Context>,
   logout?: Resolver<ResolversTypes['String'], ParentType, Context>,
   refresh?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
-  updateConnectedRepos?: Resolver<Maybe<Array<ResolversTypes['String']>>, ParentType, Context, QueryUpdateConnectedReposArgs>,
   readFile?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, QueryReadFileArgs>,
   readFiles?: Resolver<Maybe<Array<ResolversTypes['File']>>, ParentType, Context>,
   readImage?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, QueryReadImageArgs>,

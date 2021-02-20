@@ -13,8 +13,3 @@ type GithubUser {
   name: String
   configuration: Configuration
 }
-
-type Configuration {
-  id: Int!
-  connectedRepos: [String!]
-}

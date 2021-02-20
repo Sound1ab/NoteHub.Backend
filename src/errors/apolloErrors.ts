@@ -1,5 +1,5 @@
-import { GraphQLError } from 'graphql'
 import { APOLLO_ERRORS } from './extensionCodes'
+import { GraphQLError } from 'graphql'
 
 // This Class has been copied from apollo-server-errors to remove
 // transpiling issues in ts-jest
@@ -40,6 +40,14 @@ export class ApolloError extends Error implements GraphQLError {
   }
 }
 
+export class JwtMissingError extends ApolloError {
+  constructor() {
+    super('JWT missing', APOLLO_ERRORS.JWT_MISSING)
+
+    Object.defineProperty(this, 'name', { value: 'JwtMissing' })
+  }
+}
+
 export class JwtExpiredError extends ApolloError {
   constructor() {
     super('JWT has expired', APOLLO_ERRORS.JWT_EXPIRED)
@@ -69,5 +77,21 @@ export class RefreshTokenNotValidError extends ApolloError {
     super('Refresh Token is not valid', APOLLO_ERRORS.REFRESH_TOKEN_NOT_VALID)
 
     Object.defineProperty(this, 'name', { value: 'RefreshTokenNotValid' })
+  }
+}
+
+export class ConfigurationNotFoundError extends ApolloError {
+  constructor() {
+    super('Configuration not found', APOLLO_ERRORS.CONFIGURATION_NOT_FOUND)
+
+    Object.defineProperty(this, 'name', { value: 'ConfigurationNotFound' })
+  }
+}
+
+export class UpdateError extends ApolloError {
+  constructor() {
+    super('Update error', APOLLO_ERRORS.UPDATE_ERROR)
+
+    Object.defineProperty(this, 'name', { value: 'UpdateError' })
   }
 }

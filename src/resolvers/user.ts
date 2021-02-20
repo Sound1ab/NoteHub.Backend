@@ -1,10 +1,12 @@
 import {
   GithubUser,
+  Node_Type,
   QueryReadGithubUserAccessTokenArgs,
 } from '../resolvers-types'
 import { JwtManager, UserManager } from '../services'
-import { addCookie, encrypt } from '../utils'
+import { addCookie, encodeNodeId, encrypt } from '../utils'
 
+import { ConfigurationManager } from '../services/configuration/ConfigurationManager'
 import { IContext } from '../server'
 
 const jwtManager = new JwtManager()
@@ -42,8 +44,12 @@ export const UserQueries = {
   ): Promise<GithubUser> {
     const userManager = new UserManager(context)
 
-    const user = await userManager.readUser()
+    const { id, login, ...rest } = await userManager.readUser()
 
-    // get user configuration from dynamodb
+    const configurationManager = new ConfigurationManager(login)
+
+    const configuration = await configurationManager.readConfiguration()
+
+    return { id, login, configuration, ...rest }
   },
 }

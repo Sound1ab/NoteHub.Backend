@@ -6,5 +6,8 @@ export function generateTypedefs() {
   const repo = require('./repo.graphql')
   const user = require('./user.graphql')
   const authorization = require('./authorization.graphql')
-  return mergeTypes([file, image, repo, user, authorization], { all: true })
+  const configuration = require('./configuration.graphql')
+  return mergeTypes([file, image, repo, user, authorization, configuration], {
+    all: true,
+  })
 }
