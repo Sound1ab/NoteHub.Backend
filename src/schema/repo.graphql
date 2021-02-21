@@ -18,6 +18,7 @@ type Repo {
   full_name: String!
   description: String
   private: Boolean!
+  updated_at: String!
 }
 
 ## Query outputs

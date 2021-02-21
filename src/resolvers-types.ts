@@ -186,6 +186,7 @@ export type Repo = {
   full_name: Scalars['String'],
   description?: Maybe<Scalars['String']>,
   private: Scalars['Boolean'],
+  updated_at: Scalars['String'],
 };
 
 export enum Retext_Settings {
@@ -372,6 +373,7 @@ export type RepoResolvers<Context = any, ParentType = ResolversTypes['Repo']> = 
   full_name?: Resolver<ResolversTypes['String'], ParentType, Context>,
   description?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
   private?: Resolver<ResolversTypes['Boolean'], ParentType, Context>,
+  updated_at?: Resolver<ResolversTypes['String'], ParentType, Context>,
 };
 
 export type Resolvers<Context = any> = {

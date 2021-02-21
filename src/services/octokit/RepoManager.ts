@@ -12,10 +12,9 @@ export class RepoManager extends Github {
   }
 
   public async listRepos(): Promise<Repo[]> {
-    const { data } = await this.octokit.repos.listForUser({
+    const { data } = await this.octokit.repos.list({
       per_page: 100,
       sort: 'updated',
-      username: this.owner,
     })
     return data
   }

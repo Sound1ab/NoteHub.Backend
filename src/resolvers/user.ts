@@ -1,10 +1,9 @@
 import {
   GithubUser,
-  Node_Type,
   QueryReadGithubUserAccessTokenArgs,
 } from '../resolvers-types'
 import { JwtManager, UserManager } from '../services'
-import { addCookie, encodeNodeId, encrypt } from '../utils'
+import { addCookie, encrypt } from '../utils'
 
 import { ConfigurationManager } from '../services/configuration/ConfigurationManager'
 import { IContext } from '../server'
