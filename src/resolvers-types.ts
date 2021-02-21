@@ -25,6 +25,10 @@ export type DeleteFileInput = {
   path: Scalars['String'],
 };
 
+export type DeleteRepoInput = {
+  name: Scalars['String'],
+};
+
 export type File = {
    __typename?: 'File',
   id: Scalars['ID'],
@@ -127,6 +131,11 @@ export type MutationUpdateRepoArgs = {
   input: UpdateRepoInput
 };
 
+
+export type MutationDeleteRepoArgs = {
+  input: DeleteRepoInput
+};
+
 export enum Node_Type {
   File = 'FILE',
   Folder = 'FOLDER',
@@ -138,6 +147,7 @@ export type Query = {
   login: Scalars['String'],
   logout: Scalars['String'],
   refresh?: Maybe<Scalars['String']>,
+  readConfiguration?: Maybe<Configuration>,
   readFile?: Maybe<File>,
   readFiles?: Maybe<Array<File>>,
   readImage?: Maybe<File>,
@@ -155,6 +165,11 @@ export type QueryReadFileArgs = {
 
 export type QueryReadImageArgs = {
   path: Scalars['String']
+};
+
+
+export type QueryReadRepoArgs = {
+  name: Scalars['String']
 };
 
 
@@ -192,6 +207,7 @@ export type UpdateFileInput = {
 };
 
 export type UpdateRepoInput = {
+  name: Scalars['String'],
   description?: Maybe<Scalars['String']>,
   private?: Maybe<Scalars['Boolean']>,
 };
@@ -262,6 +278,7 @@ export type DirectiveResolverFn<TResult = {}, TParent = {}, TContext = {}, TArgs
 export type ResolversTypes = {
   Query: Query,
   String: Scalars['String'],
+  Configuration: Configuration,
   File: File,
   ID: Scalars['ID'],
   NODE_TYPE: Node_Type,
@@ -269,7 +286,6 @@ export type ResolversTypes = {
   Int: Scalars['Int'],
   Boolean: Scalars['Boolean'],
   GithubUser: GithubUser,
-  Configuration: Configuration,
   Mutation: Mutation,
   UpdateConfigurationInput: UpdateConfigurationInput,
   CreateFileInput: CreateFileInput,
@@ -278,6 +294,7 @@ export type ResolversTypes = {
   DeleteFileInput: DeleteFileInput,
   MoveFileInput: MoveFileInput,
   UpdateRepoInput: UpdateRepoInput,
+  DeleteRepoInput: DeleteRepoInput,
   Links: Links,
   ModelFileConnection: ModelFileConnection,
   ModelRepoConnection: ModelRepoConnection,
@@ -331,17 +348,18 @@ export type MutationResolvers<Context = any, ParentType = ResolversTypes['Mutati
   createSignedUrl?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
   createRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>,
   updateRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context, MutationUpdateRepoArgs>,
-  deleteRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>,
+  deleteRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context, MutationDeleteRepoArgs>,
 };
 
 export type QueryResolvers<Context = any, ParentType = ResolversTypes['Query']> = {
   login?: Resolver<ResolversTypes['String'], ParentType, Context>,
   logout?: Resolver<ResolversTypes['String'], ParentType, Context>,
   refresh?: Resolver<Maybe<ResolversTypes['String']>, ParentType, Context>,
+  readConfiguration?: Resolver<Maybe<ResolversTypes['Configuration']>, ParentType, Context>,
   readFile?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, QueryReadFileArgs>,
   readFiles?: Resolver<Maybe<Array<ResolversTypes['File']>>, ParentType, Context>,
   readImage?: Resolver<Maybe<ResolversTypes['File']>, ParentType, Context, QueryReadImageArgs>,
-  readRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context>,
+  readRepo?: Resolver<Maybe<ResolversTypes['Repo']>, ParentType, Context, QueryReadRepoArgs>,
   listRepos?: Resolver<Maybe<Array<ResolversTypes['Repo']>>, ParentType, Context>,
   readGithubUserAccessToken?: Resolver<ResolversTypes['String'], ParentType, Context, QueryReadGithubUserAccessTokenArgs>,
   readGithubUser?: Resolver<Maybe<ResolversTypes['GithubUser']>, ParentType, Context>,

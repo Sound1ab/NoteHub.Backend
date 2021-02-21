@@ -1,13 +1,13 @@
 ## Base
 extend type Query {
-  readRepo: Repo
+  readRepo(name: String!): Repo
   listRepos: [Repo!]
 }
 
 type Mutation {
   createRepo: Repo
   updateRepo(input: UpdateRepoInput!): Repo
-  deleteRepo: Repo
+  deleteRepo(input: DeleteRepoInput!): Repo
 }
 
 ## Types
@@ -27,6 +27,11 @@ type ModelRepoConnection {
 
 ## Mutation inputs
 input UpdateRepoInput {
+  name: String!
   description: String
   private: Boolean
+}
+
+input DeleteRepoInput {
+  name: String!
 }

@@ -3,10 +3,10 @@ import { Repo, UpdateRepoInput } from '../../resolvers-types'
 import { Github } from './Base'
 
 export class RepoManager extends Github {
-  public async readRepo(): Promise<Repo> {
+  public async readRepo(name: string): Promise<Repo> {
     const { data } = await this.octokit.repos.get({
       owner: this.owner,
-      repo: this.repo,
+      repo: name,
     })
     return data
   }
@@ -17,7 +17,6 @@ export class RepoManager extends Github {
       sort: 'updated',
       username: this.owner,
     })
-    console.log('here', data)
     return data
   }
 
@@ -31,10 +30,11 @@ export class RepoManager extends Github {
   }
 
   public async updateRepo({
+    name,
     description: updatedDescription,
     private: updatedPrivate,
   }: UpdateRepoInput): Promise<Repo> {
-    const { description, private: isPrivate } = await this.readRepo()
+    const { description, private: isPrivate } = await this.readRepo(name)
     const { data } = await this.octokit.repos.update({
       description: updatedDescription || description || '',
       owner: this.owner,
@@ -44,11 +44,11 @@ export class RepoManager extends Github {
     return data
   }
 
-  public async deleteRepo(): Promise<Repo> {
-    const originalRepo = await this.readRepo()
+  public async deleteRepo(name: string): Promise<Repo> {
+    const originalRepo = await this.readRepo(name)
     await this.octokit.repos.delete({
       owner: this.owner,
-      repo: this.repo,
+      repo: name,
     })
     return originalRepo
   }

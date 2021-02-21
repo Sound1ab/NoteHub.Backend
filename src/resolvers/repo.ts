@@ -1,13 +1,22 @@
-import { MutationUpdateRepoArgs, Repo } from '../resolvers-types'
+import {
+  MutationDeleteRepoArgs,
+  MutationUpdateRepoArgs,
+  QueryReadRepoArgs,
+  Repo,
+} from '../resolvers-types'
 
 import { IContext } from '../server'
 import { RepoManager } from '../services'
 
 export const RepoQueries = {
-  async readRepo(_: any, _1: any, context: IContext): Promise<Repo> {
+  async readRepo(
+    _: any,
+    { name }: QueryReadRepoArgs,
+    context: IContext
+  ): Promise<Repo> {
     const repoManager = new RepoManager(context)
 
-    return repoManager.readRepo()
+    return repoManager.readRepo(name)
   },
   async listRepos(_: any, _1: any, context: IContext): Promise<Repo[]> {
     const repoManager = new RepoManager(context)
@@ -31,9 +40,13 @@ export const RepoMutations = {
 
     return repoManager.updateRepo(input)
   },
-  async deleteRepo(_: any, _1: any, context: IContext): Promise<Repo> {
+  async deleteRepo(
+    _: any,
+    { input: { name } }: MutationDeleteRepoArgs,
+    context: IContext
+  ): Promise<Repo> {
     const repoManager = new RepoManager(context)
 
-    return repoManager.deleteRepo()
+    return repoManager.deleteRepo(name)
   },
 }
