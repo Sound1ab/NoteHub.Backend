@@ -1,4 +1,8 @@
 ## Base
+extend type Query {
+  readConfiguration: Configuration
+}
+
 extend type Mutation {
   updateConfiguration(input: UpdateConfigurationInput!): Configuration
 }

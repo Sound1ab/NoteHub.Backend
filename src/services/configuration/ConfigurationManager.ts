@@ -37,6 +37,7 @@ export class ConfigurationManager {
 
     if (!result?.Item) {
       await this.createConfiguration()
+      return this.readConfiguration()
     }
 
     return {

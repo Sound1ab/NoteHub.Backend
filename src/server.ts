@@ -1,5 +1,8 @@
 import { APIGatewayProxyEvent, Context } from 'aws-lambda'
-import { ConfigurationMutations } from './resolvers/configuration'
+import {
+  ConfigurationMutations,
+  ConfigurationQueries,
+} from './resolvers/configuration'
 import { FileMutations, FileQueries } from './resolvers/file'
 import { ImageMutations, ImageQueries } from './resolvers/image'
 import { RepoMutations, RepoQueries } from './resolvers/repo'
@@ -32,6 +35,7 @@ export function configureServer() {
       ...FileQueries,
       ...ImageQueries,
       ...AuthorizationQueries,
+      ...ConfigurationQueries,
     },
   }
   return new ApolloServer({
