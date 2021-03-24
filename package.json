@@ -49,7 +49,7 @@
     "@middy/http-cors": "^1.5.2",
     "@middy/http-error-handler": "^1.5.2",
     "@middy/http-header-normalizer": "^1.5.2",
-    "@octokit/plugin-throttling": "^2.4.0",
+    "@octokit/plugin-throttling": "^3.3.1",
     "@octokit/rest": "^16.25.1",
     "apollo-link-http-common": "^0.2.16",
     "apollo-server-lambda": "^2.9.16",
