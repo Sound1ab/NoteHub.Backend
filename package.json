@@ -45,6 +45,10 @@
     "typescript": "^3.7.4"
   },
   "dependencies": {
+    "@middy/core": "^1.5.2",
+    "@middy/http-cors": "^1.5.2",
+    "@middy/http-error-handler": "^1.5.2",
+    "@middy/http-header-normalizer": "^1.5.2",
     "@octokit/plugin-throttling": "^2.4.0",
     "@octokit/rest": "^16.25.1",
     "apollo-link-http-common": "^0.2.16",
@@ -61,6 +65,7 @@
     "graphql": "^14.2.1",
     "graphql-request": "^1.8.2",
     "graphql-tag": "^2.10.3",
+    "http-errors": "^1.8.0",
     "merge-graphql-schemas": "^1.5.8",
     "njwt": "^1.0.0",
     "parse-english": "^4.2.0",

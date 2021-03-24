@@ -17,4 +17,5 @@ export const allowHeaders = [
   'x-authorization',
   'x-http-method-override',
   'x-requested-with',
+  'cookie',
 ]

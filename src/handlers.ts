@@ -1,6 +1,12 @@
-import { APIGatewayProxyHandler } from 'aws-lambda'
+import { APIGatewayProxyEvent, APIGatewayProxyHandler } from 'aws-lambda'
+
+import { refresh as _refresh } from './refresh'
 import { configureServer } from './server'
+import cors from '@middy/http-cors'
 import { forwardGitRequest } from './proxy/forwardGitRequest'
+import httpErrorHandler from '@middy/http-error-handler'
+import httpHeaderNormalizer from '@middy/http-header-normalizer'
+import middy from '@middy/core'
 
 export const graphql = configureServer().createHandler({
   cors: {
@@ -8,20 +14,6 @@ export const graphql = configureServer().createHandler({
     origin: true,
   },
 })
-
-export const hello: APIGatewayProxyHandler = async event => {
-  return {
-    body: JSON.stringify(
-      {
-        input: event,
-        message: 'API is up and running!',
-      },
-      null,
-      2
-    ),
-    statusCode: 200,
-  }
-}
 
 export const webhook: APIGatewayProxyHandler = async event => {
   console.log('we got the hook!', event)
@@ -38,23 +30,44 @@ export const webhook: APIGatewayProxyHandler = async event => {
   }
 }
 
-export const proxy = async (event: any) => {
-  try {
-    const response = await forwardGitRequest(event)
+export const proxy = middy(async (event: APIGatewayProxyEvent) => {
+  return forwardGitRequest(event)
+})
+  .use(
+    cors({
+      credentials: true,
+      headers: 'Authorization',
+      origins: [
+        'http://noted-development.s3-website-eu-west-1.amazonaws.com',
+        'https://notehub.xyz',
+        'https://www.notehub.xyz',
+      ],
+    })
+  )
+  .use(httpErrorHandler())
+  .use(httpHeaderNormalizer())
 
-    return {
-      ...response,
-      headers: {
-        ...response.headers,
-        'Access-Control-Allow-Credentials': 'true',
-        'Access-Control-Allow-Headers': 'Authorization',
-        'Access-Control-Allow-Origin': '*',
-      },
-    }
-  } catch (e) {
-    return {
-      body: JSON.stringify(e.message),
-      statusCode: 500,
-    }
+export const refresh = middy(async (event: APIGatewayProxyEvent) => {
+  const { regeneratedJwt, regeneratedCookie } = await _refresh(event)
+
+  return {
+    body: JSON.stringify(regeneratedJwt),
+    headers: {
+      'Set-Cookie': regeneratedCookie,
+    },
+    statusCode: 200,
   }
-}
+})
+  .use(
+    cors({
+      credentials: true,
+      headers: 'Authorization',
+      origins: [
+        'http://noted-development.s3-website-eu-west-1.amazonaws.com',
+        'https://notehub.xyz',
+        'https://www.notehub.xyz',
+      ],
+    })
+  )
+  .use(httpErrorHandler())
+  .use(httpHeaderNormalizer())

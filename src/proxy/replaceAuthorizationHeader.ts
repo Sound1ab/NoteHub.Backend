@@ -1,27 +1,30 @@
+import createHttpError from 'http-errors'
 import { extractJwtFromAuth } from './extractJwtFromAuth'
 import { lowerCaseObjectProps } from './lowerCaseObjectProps'
 import { verifyJwtAndGetUserDetails } from './verifyJwtAndGetUserDetails'
 
-export function replaceAuthorizationHeader(headers: Record<string, string>) {
+export async function replaceAuthorizationHeader(
+  headers: Record<string, string>
+) {
   // Lowercase request headers to match allowHeaders
-  const { authorization, ...rest } = lowerCaseObjectProps(headers)
+  const { authorization, cookie, ...rest } = lowerCaseObjectProps(headers)
 
   const jwt = extractJwtFromAuth(authorization)
 
-  try {
-    const accessToken = jwt ? verifyJwtAndGetUserDetails(jwt).accessToken : null
+  let accessToken: string | null
 
-    return {
-      ...rest,
-      ...(accessToken
-        ? {
-            Authorization: `Basic ${Buffer.from(accessToken).toString(
-              'base64'
-            )}`,
-          }
-        : undefined),
-    }
-  } catch {
-    return rest
+  try {
+    accessToken = jwt ? verifyJwtAndGetUserDetails(jwt).accessToken : null
+  } catch (err) {
+    throw new createHttpError.Unauthorized()
+  }
+
+  return {
+    ...rest,
+    ...(accessToken
+      ? {
+          Authorization: `Basic ${Buffer.from(accessToken).toString('base64')}`,
+        }
+      : undefined),
   }
 }

@@ -52,12 +52,6 @@ custom:
     allowMismatchedSignatures: true
 
 functions:
-  hello:
-    handler: src/handlers.hello
-    events:
-      - http:
-          method: get
-          path: hello
   webhook:
     handler: src/handlers.webhook
     events:
@@ -106,6 +100,21 @@ functions:
               - X-Amz-Security-Token
               - X-Amz-User-Agent
               - Owner
+  refresh:
+    handler: src/handlers.refresh
+    timeout: 10
+    events:
+      - http:
+          method: GET
+          path: refresh
+          cors:
+            origins:
+              - 'http://noted-development.s3-website-eu-west-1.amazonaws.com'
+              - 'https://notehub.xyz'
+              - 'https://www.notehub.xyz'
+            allowCredentials: true
+            headers:
+              - Authorization
 
 resources:
   Resources:

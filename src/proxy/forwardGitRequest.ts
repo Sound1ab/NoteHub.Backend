@@ -1,5 +1,6 @@
 import { APIGatewayProxyEvent } from 'aws-lambda'
 import { allow } from './allow'
+import createHttpError from 'http-errors'
 import fetch from 'node-fetch'
 import { filterResponseHeaders } from './filterResponseHeaders'
 import { getQueryString } from './getQueryString'
@@ -17,19 +18,14 @@ export async function forwardGitRequest(event: APIGatewayProxyEvent) {
     isBase64Encoded,
   } = event
 
-  if (httpMethod === 'OPTIONS') {
-    return {
-      statusCode: 200,
-    }
-  }
-
   const pathdomain = pathParameters?.proxy
 
-  if (!pathdomain) throw new Error('Proxy: pathdomain missing')
+  if (!pathdomain) throw new createHttpError.BadRequest()
 
-  const requestHeaders: Record<string, string> = replaceAuthorizationHeader(
-    headers
-  )
+  const requestHeaders: Record<
+    string,
+    string
+  > = await replaceAuthorizationHeader(headers)
 
   // GitHub uses user-agent sniffing for git/* and changes its behavior which is frustrating
   if (

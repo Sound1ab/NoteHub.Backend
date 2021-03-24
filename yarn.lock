@@ -1359,6 +1359,30 @@
     methods "^1.1.2"
     path-to-regexp "^6.1.0"
 
+"@middy/core@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@middy/core/-/core-1.5.2.tgz#41e09c541ad13fd7acc48a63a72a211206ce2f2b"
+  integrity sha512-ja9hE3BheH9brkpFvNZ8bEQjopTT6ldGSbCPSGZk3UVgC9i9SdhoPOoFetrl3sOBO/sG6L8kKPxxUWeo1aO9Ug==
+  dependencies:
+    once "^1.4.0"
+
+"@middy/http-cors@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@middy/http-cors/-/http-cors-1.5.2.tgz#ce3a9a9ce95a6c7e41f803127c1450de79bb1de1"
+  integrity sha512-B+9rZv/cO+blbZ7RgZVRMCIbpawOJtmwsQvB6ctiodpTkTkjV348FPVFVIB+MBr42zWTUPsF2HZZCiL3qTyhiA==
+
+"@middy/http-error-handler@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@middy/http-error-handler/-/http-error-handler-1.5.2.tgz#7893ca1b1e958b3da5057e4a1ebde63df44c325c"
+  integrity sha512-9np6E6P2+Wpx/1QyxZ9JuLpk5XB+lqgNdDKwcNTIxqtzUxbextqVc17ZpiNfyWdmiiRsSfiqzZkIdBdyXrbLDg==
+  dependencies:
+    http-errors "^1.6.3"
+
+"@middy/http-header-normalizer@^1.5.2":
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/@middy/http-header-normalizer/-/http-header-normalizer-1.5.2.tgz#36c7809c8a02c8c77c013fa423b5bc76ed6554f3"
+  integrity sha512-WdFQu+cZn+ReBKAtWDGmZE9c7PAhxRzYrW+QEfds0f0W81aqcS7afNTaKBLRv22ukFRu+5Kc+K5z/vlG/Otldg==
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "https://registry.yarnpkg.com/@mrmlnc/readdir-enhanced/-/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"
@@ -6139,7 +6163,7 @@ http-errors@1.7.2:
     statuses ">= 1.5.0 < 2"
     toidentifier "1.0.0"
 
-http-errors@^1.6.3, http-errors@^1.7.3:
+http-errors@^1.6.3, http-errors@^1.7.3, http-errors@^1.8.0:
   version "1.8.0"
   resolved "https://registry.yarnpkg.com/http-errors/-/http-errors-1.8.0.tgz#75d1bbe497e1044f51e4ee9e704a62f28d336507"
   integrity sha512-4I8r0C5JDhT5VkvI47QktDW75rNlGVsUf/8hzjCC/wkWI/jdTRmBb9aI7erSG82r1bjKY3F6k28WnsVxB1C73A==

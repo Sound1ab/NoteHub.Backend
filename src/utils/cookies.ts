@@ -1,11 +1,15 @@
 import { AuthenticationError } from 'apollo-server-lambda'
 import Cookie from 'cookie'
 
-export const addCookie = (context: any, name: string, value: string) => {
-  const cookie = Cookie.serialize(name, value, {
+export const createCookie = (name: string, value: string) => {
+  return Cookie.serialize(name, value, {
     httpOnly: true,
     maxAge: 60 * 60 * 24 * 7, // 1 week
   })
+}
+
+export const addCookie = (context: any, name: string, value: string) => {
+  const cookie = createCookie(name, value)
 
   context.addHeaders = [{ key: 'Set-Cookie', value: cookie }]
 }
