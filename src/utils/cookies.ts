@@ -4,7 +4,9 @@ import Cookie from 'cookie'
 export const createCookie = (name: string, value: string) => {
   return Cookie.serialize(name, value, {
     httpOnly: true,
-    maxAge: 60 * 60 * 24 * 7, // 1 week
+    maxAge: 60 * 60 * 24 * 7, // 1 week,
+    sameSite: 'none',
+    secure: true,
   })
 }
 
@@ -18,6 +20,8 @@ export const removeCookie = (context: any, name: string) => {
   const cookie = Cookie.serialize(name, '', {
     expires: new Date('August 19, 1975 23:15:30'),
     httpOnly: true,
+    sameSite: 'none',
+    secure: true,
   })
 
   context.addHeaders = [{ key: 'Set-Cookie', value: cookie }]
