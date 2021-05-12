@@ -33,6 +33,8 @@ export const webhook: APIGatewayProxyHandler = async event => {
 export const proxy = middy(async (event: APIGatewayProxyEvent) => {
   return forwardGitRequest(event)
 })
+  .use(httpErrorHandler())
+  .use(httpHeaderNormalizer())
   .use(
     cors({
       credentials: true,
@@ -44,8 +46,6 @@ export const proxy = middy(async (event: APIGatewayProxyEvent) => {
       ],
     })
   )
-  .use(httpErrorHandler())
-  .use(httpHeaderNormalizer())
 
 export const refresh = middy(async (event: APIGatewayProxyEvent) => {
   const { regeneratedJwt, regeneratedCookie } = await _refresh(event)
@@ -58,6 +58,8 @@ export const refresh = middy(async (event: APIGatewayProxyEvent) => {
     statusCode: 200,
   }
 })
+  .use(httpErrorHandler())
+  .use(httpHeaderNormalizer())
   .use(
     cors({
       credentials: true,
@@ -66,8 +68,7 @@ export const refresh = middy(async (event: APIGatewayProxyEvent) => {
         'http://noted-development.s3-website-eu-west-1.amazonaws.com',
         'https://notehub.xyz',
         'https://www.notehub.xyz',
+        'http://localhost:8080',
       ],
     })
   )
-  .use(httpErrorHandler())
-  .use(httpHeaderNormalizer())

@@ -49,7 +49,11 @@ export class JwtManager {
       login,
     }
 
-    return nJwt.create(claims, jwtSigningKey)
+    const jwt = nJwt.create(claims, jwtSigningKey)
+
+    jwt.setExpiration(new Date().getTime() + 10 * 1000)
+
+    return jwt
   }
 
   public createRefreshToken() {

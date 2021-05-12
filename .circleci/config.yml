@@ -41,6 +41,7 @@ commands:
   configure-aws:
     description: 'Install dependencies for AWS and Serverless'
     steps:
+      - run: sudo apt-get -y update
       - run: sudo apt-get install python-dev python-pip
       - run: sudo pip install awscli
       - run: sudo npm i -g serverless
