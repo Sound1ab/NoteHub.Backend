@@ -1,0 +1,27 @@
+version: 2
+updates:
+- package-ecosystem: npm
+  directory: "/"
+  schedule:
+    interval: monthly
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: "@octokit/rest"
+    versions:
+    - 18.0.12
+    - 18.0.15
+    - 18.3.0
+  - dependency-name: webpack
+    versions:
+    - 5.16.0
+    - 5.19.0
+  - dependency-name: aws-sdk
+    versions:
+    - 2.830.0
+    - 2.834.0
+  - dependency-name: "@graphql-codegen/typescript-resolvers"
+    versions:
+    - 1.18.1
+  - dependency-name: elliptic
+    versions:
+    - 6.5.3
