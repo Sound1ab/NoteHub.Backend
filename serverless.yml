@@ -135,7 +135,7 @@ resources:
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
     ConfigurationDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Retain
+      DeletionPolicy: Delete
       Properties:
         AttributeDefinitions:
           - AttributeName: id
