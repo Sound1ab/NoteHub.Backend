@@ -13,9 +13,9 @@ provider:
   stage: ${opt:stage, 'dev'}
   region: eu-west-1
   environment:
-    DYNAMODB_TABLE: ${self:service}-${opt:stage, self:provider.stage}-refresh-tokens
-    USER_CONFIGURATION_TABLE: ${self:service}-${opt:stage, self:provider.stage}-user-configuration
-    S3_IMAGE_BUCKET: ${self:service}-${opt:stage, self:provider.stage}-images
+    DYNAMODB_TABLE: ${self:service.name}-${opt:stage, self:provider.stage}-refresh-tokens
+    USER_CONFIGURATION_TABLE: ${self:service.name}-${opt:stage, self:provider.stage}-user-configuration
+    S3_IMAGE_BUCKET: ${self:service.name}-${opt:stage, self:provider.stage}-images
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -135,7 +135,7 @@ resources:
         TableName: ${self:provider.environment.DYNAMODB_TABLE}
     ConfigurationDynamoDbTable:
       Type: 'AWS::DynamoDB::Table'
-      DeletionPolicy: Delete
+      DeletionPolicy: Retain
       Properties:
         AttributeDefinitions:
           - AttributeName: id
