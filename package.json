@@ -1,7 +1,6 @@
 {
   "name": "api",
   "version": "1.0.0",
-  "type": "module",
   "description": "",
   "scripts": {
     "test": "jest",
@@ -35,6 +34,7 @@
     "jest": "^25.1.0",
     "prettier": "^1.19.1",
     "serverless-dynamodb-local": "^0.2.38",
+    "serverless-offline": "6.9.0",
     "serverless-s3-local": "^0.6.7",
     "source-map-support": "^0.5.10",
     "ts-jest": "^24.3.0",
@@ -80,6 +80,9 @@
     "webpack": "^4.29.6",
     "webpack-node-externals": "^1.7.2",
     "yaml": "^1.10.0"
+  },
+  "resolutions": {
+    "node-fetch": "2"
   },
   "jest": {
     "roots": [
