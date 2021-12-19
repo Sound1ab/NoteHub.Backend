@@ -1,0 +1,1314 @@
+{
+  "service": {
+    "service": "softnote",
+    "serviceObject": {
+      "name": "softnote"
+    },
+    "provider": {
+      "stage": "prod",
+      "variableSyntax": "\\${([ ~:a-zA-Z0-9._@'\",\\-\\/\\(\\)*]+?)}",
+      "name": "aws",
+      "runtime": "nodejs14.x",
+      "region": "eu-west-1",
+      "environment": {
+        "DYNAMODB_TABLE": "softnote-prod-refresh-tokens",
+        "USER_CONFIGURATION_TABLE": "softnote-prod-user-configuration",
+        "S3_IMAGE_BUCKET": "softnote-prod-images"
+      },
+      "iamRoleStatements": [
+        {
+          "Effect": "Allow",
+          "Action": [
+            "dynamodb:Query",
+            "dynamodb:Scan",
+            "dynamodb:GetItem",
+            "dynamodb:PutItem",
+            "dynamodb:UpdateItem",
+            "dynamodb:DeleteItem",
+            "s3:PutObject",
+            "s3:GetObject"
+          ],
+          "Resource": [
+            "arn:aws:dynamodb:eu-west-1:*:table/softnote-prod-refresh-tokens",
+            "arn:aws:dynamodb:eu-west-1:*:table/softnote-prod-user-configuration",
+            "arn:aws:s3:::softnote-prod-images/*"
+          ]
+        }
+      ],
+      "apiGateway": {
+        "binaryMediaTypes": [
+          "application/x-git-upload-pack-result",
+          "application/x-git-receive-pack-result",
+          "application/x-git-receive-pack-request"
+        ]
+      },
+      "versionFunctions": true,
+      "remoteFunctionData": null,
+      "compiledCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          },
+          "WebhookLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/softnote-prod-webhook"
+            }
+          },
+          "ProxyLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/softnote-prod-proxy"
+            }
+          },
+          "GraphqlLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/softnote-prod-graphql"
+            }
+          },
+          "RefreshLogGroup": {
+            "Type": "AWS::Logs::LogGroup",
+            "Properties": {
+              "LogGroupName": "/aws/lambda/softnote-prod-refresh"
+            }
+          },
+          "IamRoleLambdaExecution": {
+            "Type": "AWS::IAM::Role",
+            "Properties": {
+              "AssumeRolePolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Principal": {
+                      "Service": [
+                        "lambda.amazonaws.com"
+                      ]
+                    },
+                    "Action": [
+                      "sts:AssumeRole"
+                    ]
+                  }
+                ]
+              },
+              "Policies": [
+                {
+                  "PolicyName": {
+                    "Fn::Join": [
+                      "-",
+                      [
+                        "prod",
+                        "softnote",
+                        "lambda"
+                      ]
+                    ]
+                  },
+                  "PolicyDocument": {
+                    "Version": "2012-10-17",
+                    "Statement": [
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:CreateLogStream"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/softnote-prod*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "Effect": "Allow",
+                        "Action": [
+                          "logs:PutLogEvents"
+                        ],
+                        "Resource": [
+                          {
+                            "Fn::Sub": "arn:${AWS::Partition}:logs:${AWS::Region}:${AWS::AccountId}:log-group:/aws/lambda/softnote-prod*:*:*"
+                          }
+                        ]
+                      },
+                      {
+                        "$ref": "$[\"service\"][\"provider\"][\"iamRoleStatements\"][0]"
+                      }
+                    ]
+                  }
+                }
+              ],
+              "Path": "/",
+              "RoleName": {
+                "Fn::Join": [
+                  "-",
+                  [
+                    "softnote",
+                    "prod",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    "lambdaRole"
+                  ]
+                ]
+              }
+            }
+          },
+          "WebhookLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/softnote/prod/1639909519134-2021-12-19T10:25:19.134Z/softnote.zip"
+              },
+              "FunctionName": "softnote-prod-webhook",
+              "Handler": "src/handlers.webhook",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs14.x",
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "DYNAMODB_TABLE": "softnote-prod-refresh-tokens",
+                  "USER_CONFIGURATION_TABLE": "softnote-prod-user-configuration",
+                  "S3_IMAGE_BUCKET": "softnote-prod-images"
+                }
+              }
+            },
+            "DependsOn": [
+              "WebhookLogGroup",
+              "IamRoleLambdaExecution"
+            ]
+          },
+          "WebhookLambdaVersionChxBHwlqDlve2stR4GEfeuywjgaNm3A2iRMgVMJncF0": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "WebhookLambdaFunction"
+              },
+              "CodeSha256": "ONq7M/gEfSmVXomwQr7a71Crf2eDPbzjfz3ulAWhWsk="
+            }
+          },
+          "ProxyLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/softnote/prod/1639909519134-2021-12-19T10:25:19.134Z/softnote.zip"
+              },
+              "FunctionName": "softnote-prod-proxy",
+              "Handler": "src/handlers.proxy",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs14.x",
+              "Timeout": 6,
+              "Environment": {
+                "Variables": {
+                  "DYNAMODB_TABLE": "softnote-prod-refresh-tokens",
+                  "USER_CONFIGURATION_TABLE": "softnote-prod-user-configuration",
+                  "S3_IMAGE_BUCKET": "softnote-prod-images"
+                }
+              }
+            },
+            "DependsOn": [
+              "ProxyLogGroup",
+              "IamRoleLambdaExecution"
+            ]
+          },
+          "ProxyLambdaVersionGmkMscuxlYPfVBj05npu3x90eHeQs6qxfghBVOML8": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "ProxyLambdaFunction"
+              },
+              "CodeSha256": "ONq7M/gEfSmVXomwQr7a71Crf2eDPbzjfz3ulAWhWsk="
+            }
+          },
+          "GraphqlLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/softnote/prod/1639909519134-2021-12-19T10:25:19.134Z/softnote.zip"
+              },
+              "FunctionName": "softnote-prod-graphql",
+              "Handler": "src/handlers.graphql",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs14.x",
+              "Timeout": 10,
+              "Environment": {
+                "Variables": {
+                  "DYNAMODB_TABLE": "softnote-prod-refresh-tokens",
+                  "USER_CONFIGURATION_TABLE": "softnote-prod-user-configuration",
+                  "S3_IMAGE_BUCKET": "softnote-prod-images"
+                }
+              }
+            },
+            "DependsOn": [
+              "GraphqlLogGroup",
+              "IamRoleLambdaExecution"
+            ]
+          },
+          "GraphqlLambdaVersionAESfLEfYfTRFJRn9tQjfgsPIejGxl2EUr0ofOfpQx3k": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "GraphqlLambdaFunction"
+              },
+              "CodeSha256": "ONq7M/gEfSmVXomwQr7a71Crf2eDPbzjfz3ulAWhWsk="
+            }
+          },
+          "RefreshLambdaFunction": {
+            "Type": "AWS::Lambda::Function",
+            "Properties": {
+              "Code": {
+                "S3Bucket": {
+                  "Ref": "ServerlessDeploymentBucket"
+                },
+                "S3Key": "serverless/softnote/prod/1639909519134-2021-12-19T10:25:19.134Z/softnote.zip"
+              },
+              "FunctionName": "softnote-prod-refresh",
+              "Handler": "src/handlers.refresh",
+              "MemorySize": 1024,
+              "Role": {
+                "Fn::GetAtt": [
+                  "IamRoleLambdaExecution",
+                  "Arn"
+                ]
+              },
+              "Runtime": "nodejs14.x",
+              "Timeout": 10,
+              "Environment": {
+                "Variables": {
+                  "DYNAMODB_TABLE": "softnote-prod-refresh-tokens",
+                  "USER_CONFIGURATION_TABLE": "softnote-prod-user-configuration",
+                  "S3_IMAGE_BUCKET": "softnote-prod-images"
+                }
+              }
+            },
+            "DependsOn": [
+              "RefreshLogGroup",
+              "IamRoleLambdaExecution"
+            ]
+          },
+          "RefreshLambdaVersionhzTTTON9Pht0qhE23byOwice1YPNSa0e495QdX2habw": {
+            "Type": "AWS::Lambda::Version",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "FunctionName": {
+                "Ref": "RefreshLambdaFunction"
+              },
+              "CodeSha256": "ONq7M/gEfSmVXomwQr7a71Crf2eDPbzjfz3ulAWhWsk="
+            }
+          },
+          "ApiGatewayRestApi": {
+            "Type": "AWS::ApiGateway::RestApi",
+            "Properties": {
+              "Name": "prod-softnote",
+              "BinaryMediaTypes": [
+                "application/x-git-upload-pack-result",
+                "application/x-git-receive-pack-result",
+                "application/x-git-receive-pack-request"
+              ],
+              "EndpointConfiguration": {
+                "Types": [
+                  "EDGE"
+                ]
+              }
+            }
+          },
+          "ApiGatewayResourceWebhook": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "webhook",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceProxy": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "proxy",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceProxyProxyVar": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Ref": "ApiGatewayResourceProxy"
+              },
+              "PathPart": "{proxy+}",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceGraphql": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "graphql",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayResourceRefresh": {
+            "Type": "AWS::ApiGateway::Resource",
+            "Properties": {
+              "ParentId": {
+                "Fn::GetAtt": [
+                  "ApiGatewayRestApi",
+                  "RootResourceId"
+                ]
+              },
+              "PathPart": "refresh",
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodProxyProxyVarOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true,
+                    "method.response.header.Access-Control-Allow-Credentials": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'http://localhost:8080'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,Owner'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'",
+                      "method.response.header.Access-Control-Allow-Credentials": "'true'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\"http://localhost:8080\") || $origin.matches(\"http://noted-development[.]s3-website-eu-west-1[.]amazonaws[.]com\") || $origin.matches(\"https://notehub[.]xyz\") || $origin.matches(\"https://www[.]notehub[.]xyz\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceProxyProxyVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodGraphqlOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true,
+                    "method.response.header.Access-Control-Allow-Credentials": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'http://noted-development.s3-website-eu-west-1.amazonaws.com'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent,Owner'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,DELETE,GET,HEAD,PATCH,POST,PUT'",
+                      "method.response.header.Access-Control-Allow-Credentials": "'true'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\"http://noted-development[.]s3-website-eu-west-1[.]amazonaws[.]com\") || $origin.matches(\"https://notehub[.]xyz\") || $origin.matches(\"https://www[.]notehub[.]xyz\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceGraphql"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodRefreshOptions": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "AuthorizationType": "NONE",
+              "HttpMethod": "OPTIONS",
+              "MethodResponses": [
+                {
+                  "StatusCode": "200",
+                  "ResponseParameters": {
+                    "method.response.header.Access-Control-Allow-Origin": true,
+                    "method.response.header.Access-Control-Allow-Headers": true,
+                    "method.response.header.Access-Control-Allow-Methods": true,
+                    "method.response.header.Access-Control-Allow-Credentials": true
+                  },
+                  "ResponseModels": {}
+                }
+              ],
+              "RequestParameters": {},
+              "Integration": {
+                "Type": "MOCK",
+                "RequestTemplates": {
+                  "application/json": "{statusCode:200}"
+                },
+                "ContentHandling": "CONVERT_TO_TEXT",
+                "IntegrationResponses": [
+                  {
+                    "StatusCode": "200",
+                    "ResponseParameters": {
+                      "method.response.header.Access-Control-Allow-Origin": "'http://noted-development.s3-website-eu-west-1.amazonaws.com'",
+                      "method.response.header.Access-Control-Allow-Headers": "'Authorization'",
+                      "method.response.header.Access-Control-Allow-Methods": "'OPTIONS,GET'",
+                      "method.response.header.Access-Control-Allow-Credentials": "'true'"
+                    },
+                    "ResponseTemplates": {
+                      "application/json": "#set($origin = $input.params(\"Origin\"))\n#if($origin == \"\") #set($origin = $input.params(\"origin\")) #end\n#if($origin.matches(\"http://noted-development[.]s3-website-eu-west-1[.]amazonaws[.]com\") || $origin.matches(\"https://notehub[.]xyz\") || $origin.matches(\"https://www[.]notehub[.]xyz\") || $origin.matches(\"http://localhost:8080\")) #set($context.responseOverride.header.Access-Control-Allow-Origin = $origin) #end"
+                    }
+                  }
+                ]
+              },
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceRefresh"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              }
+            }
+          },
+          "ApiGatewayMethodWebhookPost": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "POST",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceWebhook"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "WebhookLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodProxyProxyVarAny": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "ANY",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceProxyProxyVar"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "ProxyLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodGraphqlAny": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "ANY",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceGraphql"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "GraphqlLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayMethodRefreshGet": {
+            "Type": "AWS::ApiGateway::Method",
+            "Properties": {
+              "HttpMethod": "GET",
+              "RequestParameters": {},
+              "ResourceId": {
+                "Ref": "ApiGatewayResourceRefresh"
+              },
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "ApiKeyRequired": false,
+              "AuthorizationType": "NONE",
+              "Integration": {
+                "IntegrationHttpMethod": "POST",
+                "Type": "AWS_PROXY",
+                "Uri": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:",
+                      {
+                        "Ref": "AWS::Partition"
+                      },
+                      ":apigateway:",
+                      {
+                        "Ref": "AWS::Region"
+                      },
+                      ":lambda:path/2015-03-31/functions/",
+                      {
+                        "Fn::GetAtt": [
+                          "RefreshLambdaFunction",
+                          "Arn"
+                        ]
+                      },
+                      "/invocations"
+                    ]
+                  ]
+                }
+              },
+              "MethodResponses": []
+            }
+          },
+          "ApiGatewayDeployment1639909489601": {
+            "Type": "AWS::ApiGateway::Deployment",
+            "Properties": {
+              "RestApiId": {
+                "Ref": "ApiGatewayRestApi"
+              },
+              "StageName": "prod"
+            },
+            "DependsOn": [
+              "ApiGatewayMethodProxyProxyVarOptions",
+              "ApiGatewayMethodGraphqlOptions",
+              "ApiGatewayMethodRefreshOptions",
+              "ApiGatewayMethodWebhookPost",
+              "ApiGatewayMethodProxyProxyVarAny",
+              "ApiGatewayMethodGraphqlAny",
+              "ApiGatewayMethodRefreshGet"
+            ]
+          },
+          "WebhookLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "WebhookLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "ProxyLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "ProxyLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "GraphqlLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "GraphqlLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "RefreshLambdaPermissionApiGateway": {
+            "Type": "AWS::Lambda::Permission",
+            "Properties": {
+              "FunctionName": {
+                "Fn::GetAtt": [
+                  "RefreshLambdaFunction",
+                  "Arn"
+                ]
+              },
+              "Action": "lambda:InvokeFunction",
+              "Principal": "apigateway.amazonaws.com",
+              "SourceArn": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "arn:",
+                    {
+                      "Ref": "AWS::Partition"
+                    },
+                    ":execute-api:",
+                    {
+                      "Ref": "AWS::Region"
+                    },
+                    ":",
+                    {
+                      "Ref": "AWS::AccountId"
+                    },
+                    ":",
+                    {
+                      "Ref": "ApiGatewayRestApi"
+                    },
+                    "/*/*"
+                  ]
+                ]
+              }
+            }
+          },
+          "SigningKeyDynamoDbTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "ProvisionedThroughput": {
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+              },
+              "TableName": "softnote-prod-refresh-tokens"
+            }
+          },
+          "ConfigurationDynamoDbTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "DeletionPolicy": "Retain",
+            "Properties": {
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "id",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "id",
+                  "KeyType": "HASH"
+                }
+              ],
+              "ProvisionedThroughput": {
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+              },
+              "TableName": "softnote-prod-user-configuration"
+            }
+          },
+          "StorageBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketName": "softnote-prod-images",
+              "CorsConfiguration": {
+                "CorsRules": [
+                  {
+                    "AllowedOrigins": [
+                      "http://localhost:8080",
+                      "http://noted-development.s3-website-eu-west-1.amazonaws.com",
+                      "https://notehub.xyz",
+                      "https://www.notehub.xyz"
+                    ],
+                    "AllowedHeaders": [
+                      "*"
+                    ],
+                    "AllowedMethods": [
+                      "PUT"
+                    ],
+                    "MaxAge": 3000
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          },
+          "WebhookLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "WebhookLambdaVersionChxBHwlqDlve2stR4GEfeuywjgaNm3A2iRMgVMJncF0"
+            }
+          },
+          "ProxyLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "ProxyLambdaVersionGmkMscuxlYPfVBj05npu3x90eHeQs6qxfghBVOML8"
+            }
+          },
+          "GraphqlLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "GraphqlLambdaVersionAESfLEfYfTRFJRn9tQjfgsPIejGxl2EUr0ofOfpQx3k"
+            }
+          },
+          "RefreshLambdaFunctionQualifiedArn": {
+            "Description": "Current Lambda function version",
+            "Value": {
+              "Ref": "RefreshLambdaVersionhzTTTON9Pht0qhE23byOwice1YPNSa0e495QdX2habw"
+            }
+          },
+          "ServiceEndpoint": {
+            "Description": "URL of the service endpoint",
+            "Value": {
+              "Fn::Join": [
+                "",
+                [
+                  "https://",
+                  {
+                    "Ref": "ApiGatewayRestApi"
+                  },
+                  ".execute-api.",
+                  {
+                    "Ref": "AWS::Region"
+                  },
+                  ".",
+                  {
+                    "Ref": "AWS::URLSuffix"
+                  },
+                  "/prod"
+                ]
+              ]
+            }
+          }
+        }
+      },
+      "coreCloudFormationTemplate": {
+        "AWSTemplateFormatVersion": "2010-09-09",
+        "Description": "The AWS CloudFormation template for this Serverless application",
+        "Resources": {
+          "ServerlessDeploymentBucket": {
+            "Type": "AWS::S3::Bucket",
+            "Properties": {
+              "BucketEncryption": {
+                "ServerSideEncryptionConfiguration": [
+                  {
+                    "ServerSideEncryptionByDefault": {
+                      "SSEAlgorithm": "AES256"
+                    }
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "Outputs": {
+          "ServerlessDeploymentBucketName": {
+            "Value": {
+              "Ref": "ServerlessDeploymentBucket"
+            }
+          }
+        }
+      },
+      "vpc": {}
+    },
+    "custom": {
+      "webpack": {
+        "includeModules": true
+      },
+      "dynamodb": {
+        "stages": [
+          "prod"
+        ],
+        "start": {
+          "migrate": true
+        }
+      },
+      "s3": {
+        "host": "localhost",
+        "directory": "/tmp",
+        "cors": "./s3-cors.xml",
+        "allowMismatchedSignatures": true
+      }
+    },
+    "plugins": [
+      "serverless-dotenv-plugin",
+      "serverless-webpack",
+      "serverless-s3-local",
+      "serverless-dynamodb-local",
+      "serverless-offline"
+    ],
+    "pluginsData": {},
+    "functions": {
+      "webhook": {
+        "handler": "src/handlers.webhook",
+        "events": [
+          {
+            "http": {
+              "method": "post",
+              "path": "webhook",
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "softnote-prod-webhook",
+        "package": {
+          "artifact": ".serverless/softnote.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs14.x",
+        "vpc": {}
+      },
+      "proxy": {
+        "handler": "src/handlers.proxy",
+        "events": [
+          {
+            "http": {
+              "method": "any",
+              "path": "proxy/{proxy+}",
+              "cors": {
+                "origins": [
+                  "http://localhost:8080",
+                  "http://noted-development.s3-website-eu-west-1.amazonaws.com",
+                  "https://notehub.xyz",
+                  "https://www.notehub.xyz"
+                ],
+                "allowCredentials": true,
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent",
+                  "Owner"
+                ],
+                "methods": [
+                  "OPTIONS",
+                  "ANY"
+                ]
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "softnote-prod-proxy",
+        "package": {
+          "artifact": ".serverless/softnote.zip"
+        },
+        "memory": 1024,
+        "timeout": 6,
+        "runtime": "nodejs14.x",
+        "vpc": {}
+      },
+      "graphql": {
+        "handler": "src/handlers.graphql",
+        "timeout": 10,
+        "events": [
+          {
+            "http": {
+              "method": "any",
+              "path": "graphql",
+              "cors": {
+                "origins": [
+                  "http://noted-development.s3-website-eu-west-1.amazonaws.com",
+                  "https://notehub.xyz",
+                  "https://www.notehub.xyz"
+                ],
+                "allowCredentials": true,
+                "headers": [
+                  "Content-Type",
+                  "X-Amz-Date",
+                  "Authorization",
+                  "X-Api-Key",
+                  "X-Amz-Security-Token",
+                  "X-Amz-User-Agent",
+                  "Owner"
+                ],
+                "methods": [
+                  "OPTIONS",
+                  "ANY"
+                ]
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "softnote-prod-graphql",
+        "package": {
+          "artifact": ".serverless/softnote.zip"
+        },
+        "memory": 1024,
+        "runtime": "nodejs14.x",
+        "vpc": {}
+      },
+      "refresh": {
+        "handler": "src/handlers.refresh",
+        "timeout": 10,
+        "events": [
+          {
+            "http": {
+              "method": "get",
+              "path": "refresh",
+              "cors": {
+                "origins": [
+                  "http://noted-development.s3-website-eu-west-1.amazonaws.com",
+                  "https://notehub.xyz",
+                  "https://www.notehub.xyz",
+                  "http://localhost:8080"
+                ],
+                "allowCredentials": true,
+                "headers": [
+                  "Authorization"
+                ],
+                "methods": [
+                  "OPTIONS",
+                  "GET"
+                ]
+              },
+              "integration": "AWS_PROXY"
+            }
+          }
+        ],
+        "name": "softnote-prod-refresh",
+        "package": {
+          "artifact": ".serverless/softnote.zip"
+        },
+        "memory": 1024,
+        "runtime": "nodejs14.x",
+        "vpc": {}
+      }
+    },
+    "resources": {
+      "Resources": {
+        "SigningKeyDynamoDbTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "id",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "id",
+                "KeyType": "HASH"
+              }
+            ],
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": 1,
+              "WriteCapacityUnits": 1
+            },
+            "TableName": "softnote-prod-refresh-tokens"
+          }
+        },
+        "ConfigurationDynamoDbTable": {
+          "Type": "AWS::DynamoDB::Table",
+          "DeletionPolicy": "Retain",
+          "Properties": {
+            "AttributeDefinitions": [
+              {
+                "AttributeName": "id",
+                "AttributeType": "S"
+              }
+            ],
+            "KeySchema": [
+              {
+                "AttributeName": "id",
+                "KeyType": "HASH"
+              }
+            ],
+            "ProvisionedThroughput": {
+              "ReadCapacityUnits": 1,
+              "WriteCapacityUnits": 1
+            },
+            "TableName": "softnote-prod-user-configuration"
+          }
+        },
+        "StorageBucket": {
+          "Type": "AWS::S3::Bucket",
+          "Properties": {
+            "BucketName": "softnote-prod-images",
+            "CorsConfiguration": {
+              "CorsRules": [
+                {
+                  "AllowedOrigins": [
+                    "http://localhost:8080",
+                    "http://noted-development.s3-website-eu-west-1.amazonaws.com",
+                    "https://notehub.xyz",
+                    "https://www.notehub.xyz"
+                  ],
+                  "AllowedHeaders": [
+                    "*"
+                  ],
+                  "AllowedMethods": [
+                    "PUT"
+                  ],
+                  "MaxAge": 3000
+                }
+              ]
+            }
+          }
+        }
+      },
+      "Outputs": {}
+    },
+    "serviceFilename": "serverless.yml",
+    "layers": {}
+  },
+  "package": {
+    "artifactDirectoryName": "serverless/softnote/prod/1639909519134-2021-12-19T10:25:19.134Z",
+    "artifact": ""
+  }
+}
