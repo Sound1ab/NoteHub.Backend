@@ -5,7 +5,6 @@ export const createCookie = (name: string, value: string) => {
   return Cookie.serialize(name, value, {
     httpOnly: true,
     maxAge: 60 * 60 * 24 * 7, // 1 week,
-    path: '/',
     sameSite: 'none',
     secure: true,
   })
@@ -21,7 +20,6 @@ export const removeCookie = (context: any, name: string) => {
   const cookie = Cookie.serialize(name, '', {
     expires: new Date('August 19, 1975 23:15:30'),
     httpOnly: true,
-    path: '/',
     sameSite: 'none',
     secure: true,
   })
