@@ -51,7 +51,7 @@ export class JwtManager {
 
     const jwt = nJwt.create(claims, jwtSigningKey)
 
-    jwt.setExpiration(new Date().getTime() + 10 * 1000)
+    // jwt.setExpiration(new Date().getTime() + 10 * 1000)
 
     return jwt
   }

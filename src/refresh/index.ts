@@ -21,7 +21,7 @@ export async function refresh(event: APIGatewayProxyEvent) {
 
   const { encryptedAccessToken, iv } = await jwtManager.getClient(refreshToken)
 
-  await jwtManager.deleteClient(refreshToken)
+  // await jwtManager.deleteClient(refreshToken)
 
   const accessToken = decrypt(encryptedAccessToken, iv)
 

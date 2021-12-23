@@ -91,6 +91,7 @@ functions:
               - 'http://noted-development.s3-website-eu-west-1.amazonaws.com'
               - 'https://notehub.xyz'
               - 'https://www.notehub.xyz'
+              - 'http://localhost:8080'
             allowCredentials: true
             headers:
               - Content-Type
