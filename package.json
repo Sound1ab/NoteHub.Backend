@@ -70,7 +70,7 @@
     "http-errors": "^1.8.0",
     "merge-graphql-schemas": "^1.5.8",
     "njwt": "^1.0.0",
-    "node-fetch": "2",
+    "node-fetch": "3",
     "parse-english": "^4.2.0",
     "rand-token": "^0.4.0",
     "serverless": "1.51.0",
